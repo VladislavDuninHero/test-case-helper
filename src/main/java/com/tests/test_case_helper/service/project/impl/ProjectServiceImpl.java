@@ -2,25 +2,39 @@ package com.tests.test_case_helper.service.project.impl;
 
 import com.tests.test_case_helper.dto.project.CreateProjectDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
+import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.repository.ProjectRepository;
 import com.tests.test_case_helper.service.project.ProjectService;
+import com.tests.test_case_helper.service.utils.ProjectMapper;
+import com.tests.test_case_helper.service.validation.manager.impl.ProjectValidationManager;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectValidationManager projectValidationManager;
+    private final ProjectMapper projectMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(
+            ProjectRepository projectRepository,
+            ProjectValidationManager projectValidationManager,
+            ProjectMapper projectMapper
+    ) {
         this.projectRepository = projectRepository;
+        this.projectValidationManager = projectValidationManager;
+        this.projectMapper = projectMapper;
     }
 
     @Override
     public CreateProjectResponseDTO createProject(CreateProjectDTO createProjectDTO) {
+        projectValidationManager.validate(createProjectDTO);
 
+        Project project = projectMapper.toEntity(createProjectDTO);
 
+        Project createdProject = projectRepository.save(project);
 
-        return null;
+        return projectMapper.toDto(createdProject);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.tests.test_case_helper.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tests.test_case_helper.config.UriConfig;
 import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.constants.OfficialProperties;
 import com.tests.test_case_helper.dto.exception.UserExceptionDTO;
@@ -33,15 +34,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final UriConfig uriConfig;
 
     public JwtAuthenticationFilter(
             final ObjectMapper objectMapper,
             final UserDetailsService userDetailsService,
-            final JwtService jwtService
+            final JwtService jwtService,
+            final UriConfig uriConfig
     ) {
         this.objectMapper = objectMapper;
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
+        this.uriConfig = uriConfig;
     }
 
     @Override
@@ -50,6 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
+        String requestUrl = request.getRequestURI();
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -95,7 +101,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        if (authorizationHeader == null) {
+        if (authorizationHeader == null && !uriConfig.allowedUri().contains(requestUrl)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             UserExceptionDTO userExceptionDTO = new UserExceptionDTO(

@@ -21,7 +21,7 @@ public class ProjectController {
     }
 
     @PostMapping(Route.API_CREATE_ROUTE)
-    @PreAuthorize("hasAuthority('CREATE_PROJECT_PERMISSION')")
+    @PreAuthorize("hasAuthority('CREATE_PROJECT')")
     public ResponseEntity<CreateProjectResponseDTO> createProject(
             @RequestBody
             @Validated

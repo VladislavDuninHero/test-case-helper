@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -27,19 +27,19 @@ public class TestCase {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
     private List<TestCasePrecondition> testCasePrecondition;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
     private List<TestCaseData> testCaseData;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
     private List<TestCaseStep> steps;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
     private List<TestCaseExpectedResult> expectedResult;
 
@@ -49,9 +49,9 @@ public class TestCase {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDate created_at;
+    private LocalDateTime created_at;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDate updated_at;
+    private LocalDateTime updated_at;
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -26,15 +26,18 @@ public class Project {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Column(name = "description")
+    private String description;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "project_id")
     private List<TestSuite> testsSuites;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDate created_at;
+    private LocalDateTime created_at;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDate updated_at;
+    private LocalDateTime updated_at;
 }

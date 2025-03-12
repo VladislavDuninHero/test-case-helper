@@ -10,4 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateTestSuiteResponseDTO {
+    private String title;
+    private String project;
+    private String description;
 }

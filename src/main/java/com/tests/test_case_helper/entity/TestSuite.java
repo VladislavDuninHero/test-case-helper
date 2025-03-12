@@ -10,7 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -35,7 +35,7 @@ public class TestSuite {
     @Enumerated(EnumType.STRING)
     private Tag tag;
 
-    @OneToMany(mappedBy = "testsuite", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "testSuite", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TestCase> testsCases;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -44,9 +44,9 @@ public class TestSuite {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDate created_at;
+    private LocalDateTime created_at;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDate updated_at;
+    private LocalDateTime updated_at;
 }

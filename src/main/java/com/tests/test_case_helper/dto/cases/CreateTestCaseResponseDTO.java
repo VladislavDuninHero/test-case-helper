@@ -10,4 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateTestCaseResponseDTO {
+    private String title;
+    private String preCondition;
+    private String steps;
+    private String expectedResult;
 }
