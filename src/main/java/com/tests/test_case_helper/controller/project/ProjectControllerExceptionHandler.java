@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestControllerAdvice(basePackageClasses = ProjectController.class)
 public class ProjectControllerExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)

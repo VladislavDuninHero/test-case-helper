@@ -3,10 +3,7 @@ package com.tests.test_case_helper.entity;
 import com.tests.test_case_helper.entity.cases.TestCase;
 import com.tests.test_case_helper.enums.Tag;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +14,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "test_suite")
 public class TestSuite {

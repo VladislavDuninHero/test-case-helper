@@ -2,10 +2,7 @@ package com.tests.test_case_helper.entity.cases;
 
 import com.tests.test_case_helper.entity.TestSuite;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "test_case")
 public class TestCase {
@@ -29,11 +27,11 @@ public class TestCase {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
-    private List<TestCasePrecondition> testCasePrecondition;
+    private List<TestCaseData> testCaseData;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")
-    private List<TestCaseData> testCaseData;
+    private List<TestCasePrecondition> testCasePrecondition;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "test_case_id")

@@ -1,18 +1,20 @@
 package com.tests.test_case_helper.dto.suite;
 
-import com.tests.test_case_helper.enums.Tag;
+import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateTestSuiteResponseDTO {
+public class TestSuitDTO {
     private String title;
     private String description;
-    private Tag tag;
-    private Long projectId;
+    private List<TestCaseDTO> testCases;
+    private String project;
 }
