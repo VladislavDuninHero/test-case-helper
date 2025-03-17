@@ -2,6 +2,7 @@ package com.tests.test_case_helper.service.utils;
 
 import com.tests.test_case_helper.dto.project.CreateProjectDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
+import com.tests.test_case_helper.dto.project.ProjectDTO;
 import com.tests.test_case_helper.entity.Project;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,4 +15,8 @@ public interface ProjectMapper {
 
     @Mapping(source = "title", target = "title")
     CreateProjectResponseDTO toDto(Project project);
+
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "description", target = "description")
+    ProjectDTO currentProjectToDto(Project project);
 }

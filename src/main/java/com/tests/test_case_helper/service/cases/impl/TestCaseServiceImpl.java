@@ -46,7 +46,11 @@ public class TestCaseServiceImpl implements TestCaseService {
 
         TestCase createdTestCase = testCaseRepository.save(testCase);
 
-        return testCaseMapper.toDto(createdTestCase);
+        CreateTestCaseResponseDTO createTestCaseResponseDTO = testCaseMapper.toDto(createdTestCase);
+        createTestCaseResponseDTO.setProjectId(testSuite.getProject().getId());
+        createTestCaseResponseDTO.setTestSuiteId(testSuite.getId());
+
+        return createTestCaseResponseDTO;
     }
 
 }

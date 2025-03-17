@@ -17,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateTestCaseResponseDTO {
     private String title;
+    private Long projectId;
+    private Long testSuiteId;
     private List<TestCaseDataDTO> testCaseData;
     private List<PreconditionDTO> precondition;
     private List<StepDTO> steps;

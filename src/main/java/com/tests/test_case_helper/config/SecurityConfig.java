@@ -8,12 +8,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -27,8 +29,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            CorsConfigurationSource configurationSource
+    ) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(configurationSource))
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
@@ -39,6 +45,7 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.POST, Route.API_FULL_REGISTRATION_ROUTE).permitAll()
                                 .requestMatchers(HttpMethod.POST, Route.API_FULL_LOGIN_ROUTE).permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

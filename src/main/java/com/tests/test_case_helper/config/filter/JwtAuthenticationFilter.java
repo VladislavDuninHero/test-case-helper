@@ -58,7 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestUrl = request.getRequestURI();
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        System.out.println(authorizationHeader);
+        System.out.println(request.getHeader("asd"));
         if (
                 authorizationHeader != null
                 && authorizationHeader.startsWith(OfficialProperties.BEARER_TOKEN_PREFIX)

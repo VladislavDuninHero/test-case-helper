@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(Route.API_PROJECT_ROUTE)
 public class ProjectController {
@@ -38,5 +40,12 @@ public class ProjectController {
             @PathVariable String id
     ) {
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProjectDTO>> getProjects() {
+        List<ProjectDTO> projects = projectService.getAllProjects();
+
+        return ResponseEntity.ok(projects);
     }
 }

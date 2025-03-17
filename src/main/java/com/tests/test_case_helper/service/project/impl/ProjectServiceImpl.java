@@ -2,12 +2,15 @@ package com.tests.test_case_helper.service.project.impl;
 
 import com.tests.test_case_helper.dto.project.CreateProjectDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
+import com.tests.test_case_helper.dto.project.ProjectDTO;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.repository.ProjectRepository;
 import com.tests.test_case_helper.service.project.ProjectService;
 import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.validation.manager.impl.ProjectValidationManager;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -35,6 +38,13 @@ public class ProjectServiceImpl implements ProjectService {
         Project createdProject = projectRepository.save(project);
 
         return projectMapper.toDto(createdProject);
+    }
+
+    @Override
+    public List<ProjectDTO> getAllProjects() {
+        List<Project> projects = projectRepository.findAll();
+
+        return projects.stream().map(projectMapper::currentProjectToDto).toList();
     }
 
 }
