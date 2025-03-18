@@ -12,4 +12,5 @@ public interface JwtService {
     Claims validateToken(String token);
     String refreshAccessToken(String refreshToken);
     Set<Permission> extractPermissions(Set<Role> roles);
+    String getLoginByToken(String token);
 }

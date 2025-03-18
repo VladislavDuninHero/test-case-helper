@@ -81,4 +81,14 @@ public class JwtServiceImpl implements JwtService {
 
         return permissions;
     }
+
+    @Override
+    public String getLoginByToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(jwtSecretProperties.getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }

@@ -1,6 +1,7 @@
 package com.tests.test_case_helper.service.user.impl;
 
 import com.tests.test_case_helper.constants.ExceptionMessage;
+import com.tests.test_case_helper.dto.user.UserDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationResponseDTO;
 import com.tests.test_case_helper.entity.User;
 import com.tests.test_case_helper.exceptions.UserIsAlreadyRegisteredException;
@@ -27,6 +28,16 @@ public class UserUtilsImpl implements UserUtils {
                 .orElseThrow(
                         () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
                 );
+    }
+
+    @Override
+    public UserDTO findUserByLoginAndReturn(String login) {
+         User user = userRepository.findUserByLogin(login)
+                .orElseThrow(
+                        () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
+                );
+
+        return userMapper.toUserDTO(user);
     }
 
     @Override

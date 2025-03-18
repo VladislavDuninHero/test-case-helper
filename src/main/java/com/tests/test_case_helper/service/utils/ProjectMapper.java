@@ -16,6 +16,7 @@ public interface ProjectMapper {
     @Mapping(source = "title", target = "title")
     CreateProjectResponseDTO toDto(Project project);
 
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "description", target = "description")
     ProjectDTO currentProjectToDto(Project project);

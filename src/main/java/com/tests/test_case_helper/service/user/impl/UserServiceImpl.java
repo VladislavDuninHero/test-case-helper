@@ -1,6 +1,7 @@
 package com.tests.test_case_helper.service.user.impl;
 
 import com.tests.test_case_helper.dto.jwt.JwtDTO;
+import com.tests.test_case_helper.dto.user.UserDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginResponseDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationDTO;
@@ -78,6 +79,13 @@ public class UserServiceImpl implements UserService {
                 login,
                 jwtDTO
         );
+    }
+
+    @Override
+    public UserDTO getUserByToken(String token) {
+        String login = jwtService.getLoginByToken(token);
+
+        return userUtils.findUserByLoginAndReturn(login);
     }
 
 }

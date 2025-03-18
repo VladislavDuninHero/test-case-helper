@@ -1,4 +1,4 @@
-package com.tests.test_case_helper.dto.project;
+package com.tests.test_case_helper.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectDTO {
+public class UserDTO {
     private Long id;
-    private String title;
-    private String description;
+    private String login;
+    private String email;
 }
