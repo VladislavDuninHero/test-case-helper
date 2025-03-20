@@ -1,6 +1,7 @@
-package com.tests.test_case_helper.dto.suite;
+package com.tests.test_case_helper.dto.project;
 
-import com.tests.test_case_helper.dto.cases.TestCaseDTO;
+import com.tests.test_case_helper.dto.suite.ExtendedTestSuiteDTO;
+import com.tests.test_case_helper.dto.suite.TestSuiteDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestSuitDTO {
+public class ExtendedProjectDTO {
     private String title;
     private String description;
-    private List<TestCaseDTO> testCases;
-    private String project;
+    private List<TestSuiteDTO> testSuites;
+
 }

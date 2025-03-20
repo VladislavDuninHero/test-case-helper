@@ -1,4 +1,4 @@
-package com.tests.test_case_helper.dto.project;
+package com.tests.test_case_helper.dto.suite;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateProjectResponseDTO {
+public class TestSuiteDTO {
+    private Long id;
     private String title;
     private String description;
+    private String tag;
 }

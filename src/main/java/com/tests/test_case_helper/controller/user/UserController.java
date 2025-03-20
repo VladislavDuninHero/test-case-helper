@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping(Route.API_LOGIN_ROUTE)
-    public ResponseEntity<UserLoginResponseDTO> registration(
+    public ResponseEntity<UserLoginResponseDTO> login(
             @RequestBody
             @Validated
             UserLoginDTO userLoginDTO

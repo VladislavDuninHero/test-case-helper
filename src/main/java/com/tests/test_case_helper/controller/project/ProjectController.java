@@ -3,8 +3,11 @@ package com.tests.test_case_helper.controller.project;
 import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.project.CreateProjectDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
+import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
 import com.tests.test_case_helper.dto.project.ProjectDTO;
 import com.tests.test_case_helper.service.project.ProjectService;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -36,10 +39,15 @@ public class ProjectController {
     }
 
     @GetMapping(Route.API_GET_PROJECT_ROUTE)
-    public ResponseEntity<ProjectDTO> getProject(
-            @PathVariable String id
+    public ResponseEntity<ExtendedProjectDTO> getProject(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
     ) {
-        return ResponseEntity.ok(null);
+        ExtendedProjectDTO extendedProjectDTO = projectService.getProject(id);
+
+        return ResponseEntity.ok(extendedProjectDTO);
     }
 
     @GetMapping
