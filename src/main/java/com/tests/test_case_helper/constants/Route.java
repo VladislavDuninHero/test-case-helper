@@ -12,4 +12,5 @@ public final class Route {
     public static final String API_FULL_LOGIN_ROUTE = API_USER_ROUTE + API_LOGIN_ROUTE;
     public static final String API_CREATE_ROUTE = "/create";
     public static final String API_GET_PROJECT_ROUTE = "/{id}";
+    public static final String API_GET_TEST_SUITE_ROUTE = "/{id}";
 }

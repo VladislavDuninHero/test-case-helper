@@ -13,7 +13,12 @@ import java.util.List;
 
 public interface TestCaseUtils {
     List<TestCaseData> testCaseDataMapper(List<TestCaseDataDTO> testCaseDataDTO);
+    List<TestCaseDataDTO> testCaseDataMapperToDTO(List<TestCaseData> testCaseData);
     List<TestCasePrecondition> testCasePreconditionMapper(List<PreconditionDTO> preconditionDTO);
+    List<PreconditionDTO> testCasePreconditionMapperToDTO(List<TestCasePrecondition> preconditions);
     List<TestCaseStep> testCaseStepMapper(List<StepDTO> stepDTO);
+    List<StepDTO> testCaseStepMapperToDTO(List<TestCaseStep> steps);
     List<TestCaseExpectedResult> testCaseExpectedResultMapper(List<ExpectedResultDTO> expectedResultDTO);
+    List<ExpectedResultDTO> testCaseExpectedResultMapperToDTO(List<TestCaseExpectedResult> expectedResults);
+
 }
