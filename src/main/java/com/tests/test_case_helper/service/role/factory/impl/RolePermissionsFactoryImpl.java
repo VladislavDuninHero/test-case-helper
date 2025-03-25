@@ -18,6 +18,16 @@ public class RolePermissionsFactoryImpl implements RolePermissionsFactory {
                     Roles.QA, List.of(
                             PermissionType.CREATE_TEST_SUITE,
                             PermissionType.READ_TEST_SUITE,
+                            PermissionType.CREATE_TEST_CASES,
+                            PermissionType.READ_TEST_CASES,
+                            PermissionType.CREATE_PROJECT,
+                            PermissionType.READ_PROJECT
+                    )
+            ),
+            Map.entry(
+                    Roles.LEAD_QA, List.of(
+                            PermissionType.CREATE_TEST_SUITE,
+                            PermissionType.READ_TEST_SUITE,
                             PermissionType.UPDATE_TEST_SUITE,
                             PermissionType.DELETE_TEST_SUITE,
                             PermissionType.CREATE_TEST_CASES,

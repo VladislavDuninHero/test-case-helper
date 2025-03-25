@@ -48,12 +48,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRegistrationResponseDTO createUser(UserRegistrationDTO userRegistrationDTO) {
         userUtils.findRegisteredUser(userRegistrationDTO.getLogin());
+        userUtils.validateAdminToken(userRegistrationDTO.getToken());
 
         User user = userMapper.toEntity(userRegistrationDTO);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        roleService.createRoleForUser(user, Roles.QA);
+        roleService.createRoleForUser(user, Roles.valueOf(userRegistrationDTO.getRole().toUpperCase()));
 
         User savedUser = userRepository.save(user);
 
@@ -71,8 +72,7 @@ public class UserServiceImpl implements UserService {
         userUtils.findUserByLogin(login);
 
         JwtDTO jwtDTO = new JwtDTO(
-                jwtService.generateAccessToken(login),
-                jwtService.generateRefreshToken(login)
+                jwtService.generateAccessToken(login)
         );
 
         return new UserLoginResponseDTO(

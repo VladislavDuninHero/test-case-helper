@@ -13,4 +13,7 @@ public final class Route {
     public static final String API_CREATE_ROUTE = "/create";
     public static final String API_GET_PROJECT_ROUTE = "/{id}";
     public static final String API_GET_TEST_SUITE_ROUTE = "/{id}";
+    public static final String API_DELETE_ROUTE = "/{id}/delete";
+    public static final String API_LOGOUT_ROUTE = "/api/v1/user/logout";
+    public static final String API_HOME_ROUTE = "/";
 }

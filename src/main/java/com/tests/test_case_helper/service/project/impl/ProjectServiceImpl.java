@@ -66,4 +66,11 @@ public class ProjectServiceImpl implements ProjectService {
         );
     }
 
+    @Override
+    public void deleteProject(Long projectId) {
+        Project project = projectUtils.getProjectById(projectId);
+
+        projectRepository.delete(project);
+    }
+
 }

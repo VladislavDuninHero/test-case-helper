@@ -8,5 +8,6 @@ public final class ExceptionMessage {
     public static final String INVALID_SPECIAL_CHARACTERS_EXCEPTION_MESSAGE = "Invalid special characters";
     public static final String PROJECT_NOT_FOUND_EXCEPTION_MESSAGE = "Project not found";
     public static final String TAG_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
+    public static final String ROLE_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
     public static final String TEST_SUITE_NOT_FOUND_EXCEPTION_MESSAGE = "Test-suite not found";
 }

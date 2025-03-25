@@ -1,4 +1,4 @@
-package com.tests.test_case_helper.dto.jwt;
+package com.tests.test_case_helper.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JwtDTO {
-    private String accessToken;
+public class ResponseMessageDTO {
+    private String message;
 }

@@ -1,6 +1,7 @@
 package com.tests.test_case_helper.controller.project;
 
 import com.tests.test_case_helper.constants.Route;
+import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectDTO;
 import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
 import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
@@ -39,6 +40,7 @@ public class ProjectController {
     }
 
     @GetMapping(Route.API_GET_PROJECT_ROUTE)
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
     public ResponseEntity<ExtendedProjectDTO> getProject(
             @PathVariable
             @NotNull
@@ -51,9 +53,24 @@ public class ProjectController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
     public ResponseEntity<List<ProjectDTO>> getProjects() {
         List<ProjectDTO> projects = projectService.getAllProjects();
 
         return ResponseEntity.ok(projects);
+    }
+
+    @DeleteMapping(Route.API_DELETE_ROUTE)
+    @PreAuthorize("hasAuthority('DELETE_PROJECT')")
+    public ResponseEntity<ResponseMessageDTO> deleteProject(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+
+        projectService.deleteProject(id);
+
+        return ResponseEntity.ok(new ResponseMessageDTO("Success"));
     }
 }
