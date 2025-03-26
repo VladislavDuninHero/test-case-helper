@@ -45,7 +45,7 @@ public class User {
     @JoinColumn(name = "user_id")
     private Set<Role> roles;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

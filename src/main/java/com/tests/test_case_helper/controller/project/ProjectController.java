@@ -2,10 +2,7 @@ package com.tests.test_case_helper.controller.project;
 
 import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
-import com.tests.test_case_helper.dto.project.CreateProjectDTO;
-import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
-import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
-import com.tests.test_case_helper.dto.project.ProjectDTO;
+import com.tests.test_case_helper.dto.project.*;
 import com.tests.test_case_helper.service.project.ProjectService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -58,6 +55,23 @@ public class ProjectController {
         List<ProjectDTO> projects = projectService.getAllProjects();
 
         return ResponseEntity.ok(projects);
+    }
+
+    @PutMapping(Route.API_UPDATE_ROUTE)
+    @PreAuthorize("hasAuthority('UPDATE_PROJECT')")
+    public ResponseEntity<ProjectDTO> updateProject(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id,
+            @RequestBody
+            @Validated
+            UpdateProjectDTO projectDTO
+    ) {
+
+        ProjectDTO updatedProject = projectService.updateProject(id, projectDTO);
+
+        return ResponseEntity.ok(updatedProject);
     }
 
     @DeleteMapping(Route.API_DELETE_ROUTE)

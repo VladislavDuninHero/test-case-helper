@@ -45,7 +45,7 @@ public class TestCase {
     @JoinColumn(name = "test_suit_id")
     private TestSuite testSuite;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
     private LocalDateTime created_at;
 

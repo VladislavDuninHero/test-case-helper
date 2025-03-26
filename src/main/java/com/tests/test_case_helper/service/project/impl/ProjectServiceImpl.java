@@ -1,9 +1,6 @@
 package com.tests.test_case_helper.service.project.impl;
 
-import com.tests.test_case_helper.dto.project.CreateProjectDTO;
-import com.tests.test_case_helper.dto.project.CreateProjectResponseDTO;
-import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
-import com.tests.test_case_helper.dto.project.ProjectDTO;
+import com.tests.test_case_helper.dto.project.*;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.repository.ProjectRepository;
 import com.tests.test_case_helper.service.project.ProjectService;
@@ -64,6 +61,22 @@ public class ProjectServiceImpl implements ProjectService {
                 project.getDescription(),
                 project.getTestsSuites().stream().map(testSuiteMapper::toBaseTestSuiteDTO).toList()
         );
+    }
+
+    @Override
+    public ProjectDTO updateProject(Long projectId, UpdateProjectDTO projectDTO) {
+        projectUtils.getProjectById(projectId);
+
+        Project updateProject = Project
+                .builder()
+                .id(projectId)
+                .title(projectDTO.getTitle())
+                .description(projectDTO.getDescription())
+                .build();
+
+        Project updatedProject = projectRepository.save(updateProject);
+
+        return projectMapper.currentProjectToDto(updatedProject);
     }
 
     @Override
