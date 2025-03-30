@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Component
 public class ProjectSpecialCharacterValidator extends BaseValidator<CreateProjectDTO, CreateProjectDTO>{
 
-    private final Pattern pattern = Pattern.compile("^[a-zA-Zа-яА-Я0-9_\\s]+$");
+    private final Pattern pattern = Pattern.compile("^[a-zA-Zа-яА-Я0-9_\\s-]+$");
 
     @Override
     public CreateProjectDTO validate(CreateProjectDTO value) {

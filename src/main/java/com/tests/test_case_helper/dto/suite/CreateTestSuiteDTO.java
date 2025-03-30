@@ -20,12 +20,12 @@ public class CreateTestSuiteDTO {
 
     @NotNull
     @NotEmpty
-    @Size(min = 2, max = 100)
+    @Size(min = 1, max = 100)
     private String title;
 
     @NotNull
     @NotEmpty
-    @Size(min = 6, max = 100)
+    @Size(min = 1, max = 100)
     private String description;
 
     @NotNull
