@@ -5,6 +5,7 @@ public final class Route {
     public static final String API_TEST_CASE_ROUTE = "/api/v1/case";
     public static final String API_TEST_SUITE_ROUTE = "/api/v1/suite";
     public static final String API_PROJECT_ROUTE = "/api/v1/project";
+    public static final String API_CONVERTERS_ROUTE = "/api/v1/converters";
 
     public static final String API_REGISTRATION_ROUTE = "/registration";
     public static final String API_FULL_REGISTRATION_ROUTE = API_USER_ROUTE + API_REGISTRATION_ROUTE;
@@ -15,4 +16,5 @@ public final class Route {
     public static final String API_GET_TEST_SUITE_ROUTE = "/{id}";
     public static final String API_DELETE_ROUTE = "/{id}/delete";
     public static final String API_UPDATE_ROUTE = "/{id}/update";
+    public static final String API_EXCEL_CONVERTER_ROUTE = "/excel";
 }

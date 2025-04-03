@@ -10,7 +10,6 @@ import com.tests.test_case_helper.dto.user.registration.UserRegistrationResponse
 import com.tests.test_case_helper.service.user.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +29,6 @@ public class UserController {
             @Validated
             UserRegistrationDTO userRegistrationDTO
     ) {
-
         UserRegistrationResponseDTO createdUser = userService.createUser(userRegistrationDTO);
 
         return ResponseEntity.ok(createdUser);

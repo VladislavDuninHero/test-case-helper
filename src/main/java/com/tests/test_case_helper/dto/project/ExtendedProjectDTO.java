@@ -17,5 +17,4 @@ public class ExtendedProjectDTO {
     private String title;
     private String description;
     private List<TestSuiteDTO> testSuites;
-
 }
