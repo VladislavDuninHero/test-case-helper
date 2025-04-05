@@ -32,18 +32,14 @@ public class CreateTestCaseDTO {
     private String title;
 
     @NotNull
-    @NotEmpty
     private List<TestCaseDataDTO> testCaseData;
 
     @NotNull
-    @NotEmpty
     private List<PreconditionDTO> precondition;
 
     @NotNull
-    @NotEmpty
     private List<StepDTO> steps;
 
     @NotNull
-    @NotEmpty
     private List<ExpectedResultDTO> expectedResult;
 }

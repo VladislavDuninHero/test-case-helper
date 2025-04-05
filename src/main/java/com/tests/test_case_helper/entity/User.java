@@ -41,7 +41,7 @@ public class User {
         isEnabled = Boolean.TRUE;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<Role> roles;
 

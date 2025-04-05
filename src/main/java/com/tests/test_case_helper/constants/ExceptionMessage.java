@@ -10,4 +10,5 @@ public final class ExceptionMessage {
     public static final String TAG_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
     public static final String ROLE_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
     public static final String TEST_SUITE_NOT_FOUND_EXCEPTION_MESSAGE = "Test-suite not found";
+    public static final String USER_IS_DISABLED = "User is disabled";
 }

@@ -49,6 +49,14 @@ public class UserUtilsImpl implements UserUtils {
     }
 
     @Override
+    public User findUserEntityByLoginAndReturn(String login) {
+        return userRepository.findUserByLogin(login)
+                .orElseThrow(
+                        () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
+                );
+    }
+
+    @Override
     public void findRegisteredUser(String login) {
 
         boolean presentUser = userRepository.findUserByLogin(login).isPresent();
@@ -61,9 +69,15 @@ public class UserUtilsImpl implements UserUtils {
     }
 
     @Override
+    public User findRegisteredUserByIdAndReturn(Long userId) {
+        return userRepository.findUserById(userId)
+                .orElseThrow(
+                        () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
+                );
+    }
+
+    @Override
     public void validateAdminToken(String token) {
-        System.out.println(token);
-        System.out.println(adminSecretProperties.getToken());
         if (!adminSecretProperties.getToken().equals(token)) {
             throw new InvalidAdminTokenException(ExceptionMessage.FORBIDDEN_EXCEPTION_MESSAGE);
         }

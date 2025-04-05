@@ -12,5 +12,6 @@ public enum PermissionType {
     CREATE_PROJECT,
     READ_PROJECT,
     UPDATE_PROJECT,
-    DELETE_PROJECT
+    DELETE_PROJECT,
+    DELETE_USER
 }

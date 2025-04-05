@@ -1,5 +1,6 @@
 package com.tests.test_case_helper.service.user.impl;
 
+import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.jwt.JwtDTO;
 import com.tests.test_case_helper.dto.user.UserDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginDTO;
@@ -8,6 +9,7 @@ import com.tests.test_case_helper.dto.user.registration.UserRegistrationDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationResponseDTO;
 import com.tests.test_case_helper.entity.User;
 import com.tests.test_case_helper.enums.Roles;
+import com.tests.test_case_helper.exceptions.UserIsDisabledException;
 import com.tests.test_case_helper.repository.UserRepository;
 import com.tests.test_case_helper.service.role.RoleService;
 import com.tests.test_case_helper.service.security.jwt.JwtService;
@@ -69,7 +71,11 @@ public class UserServiceImpl implements UserService {
     ) {
         String login = userLoginDTO.getLogin();
 
-        userUtils.findUserByLogin(login);
+        User foundUser = userUtils.findUserEntityByLoginAndReturn(login);
+
+        if (!foundUser.getIsEnabled()) {
+            throw new UserIsDisabledException(ExceptionMessage.USER_IS_DISABLED);
+        }
 
         JwtDTO jwtDTO = new JwtDTO(
                 jwtService.generateAccessToken(login)
@@ -79,6 +85,15 @@ public class UserServiceImpl implements UserService {
                 login,
                 jwtDTO
         );
+    }
+
+    @Override
+    public void disableUser(Long userId) {
+        User foundUser = userUtils.findRegisteredUserByIdAndReturn(userId);
+
+        foundUser.setIsEnabled(false);
+
+        userRepository.save(foundUser);
     }
 
     @Override

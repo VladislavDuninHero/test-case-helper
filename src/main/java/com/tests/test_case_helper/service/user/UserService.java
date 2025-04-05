@@ -9,5 +9,6 @@ import com.tests.test_case_helper.dto.user.registration.UserRegistrationResponse
 public interface UserService {
     UserRegistrationResponseDTO createUser(UserRegistrationDTO userRegistrationDTO);
     UserLoginResponseDTO login(UserLoginDTO userLoginDTO);
+    void disableUser(Long userId);
     UserDTO getUserByToken(String token);
 }

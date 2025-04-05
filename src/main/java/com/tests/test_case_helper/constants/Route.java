@@ -10,6 +10,7 @@ public final class Route {
     public static final String API_REGISTRATION_ROUTE = "/registration";
     public static final String API_FULL_REGISTRATION_ROUTE = API_USER_ROUTE + API_REGISTRATION_ROUTE;
     public static final String API_LOGIN_ROUTE = "/login";
+    public static final String API_DISABLE_USER_ROUTE = "/{userId}/disable";
     public static final String API_FULL_LOGIN_ROUTE = API_USER_ROUTE + API_LOGIN_ROUTE;
     public static final String API_CREATE_ROUTE = "/create";
     public static final String API_GET_PROJECT_ROUTE = "/{id}";

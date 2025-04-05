@@ -10,4 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("FROM User u WHERE u.login = :login")
     Optional<User> findUserByLogin(String login);
+
+    @Query("FROM User u WHERE u.id = :userId")
+    Optional<User> findUserById(Long userId);
 }

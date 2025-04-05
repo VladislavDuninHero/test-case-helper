@@ -37,7 +37,8 @@ public class RolePermissionsFactoryImpl implements RolePermissionsFactory {
                             PermissionType.CREATE_PROJECT,
                             PermissionType.READ_PROJECT,
                             PermissionType.UPDATE_PROJECT,
-                            PermissionType.DELETE_PROJECT
+                            PermissionType.DELETE_PROJECT,
+                            PermissionType.DELETE_USER
                     )
             )
     );
