@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface StepMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "step", target = "step")
     TestCaseStep toEntity(StepDTO stepDTO);
 

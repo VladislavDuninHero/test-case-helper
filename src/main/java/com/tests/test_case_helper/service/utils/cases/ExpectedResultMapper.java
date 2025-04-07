@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ExpectedResultMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "step", target = "step")
     TestCaseExpectedResult toEntity(ExpectedResultDTO expectedResultDTO);
 

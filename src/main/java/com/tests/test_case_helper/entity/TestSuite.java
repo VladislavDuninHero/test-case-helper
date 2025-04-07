@@ -40,7 +40,7 @@ public class TestSuite {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
     private LocalDateTime created_at;
 

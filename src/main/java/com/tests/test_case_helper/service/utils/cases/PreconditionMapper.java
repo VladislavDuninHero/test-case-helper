@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface PreconditionMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "step", target = "step")
     TestCasePrecondition toEntity(PreconditionDTO preconditionDTO);
 

@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface TestCaseMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "title", target = "title")
     @Mapping(source = "testCaseData", target = "testCaseData")
     @Mapping(source = "precondition", target = "testCasePrecondition")

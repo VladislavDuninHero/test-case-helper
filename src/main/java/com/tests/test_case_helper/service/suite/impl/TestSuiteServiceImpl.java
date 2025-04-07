@@ -1,8 +1,6 @@
 package com.tests.test_case_helper.service.suite.impl;
 
-import com.tests.test_case_helper.dto.suite.CreateTestSuiteDTO;
-import com.tests.test_case_helper.dto.suite.CreateTestSuiteResponseDTO;
-import com.tests.test_case_helper.dto.suite.ExtendedTestSuiteDTO;
+import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.entity.TestSuite;
 import com.tests.test_case_helper.enums.Tag;
@@ -12,6 +10,7 @@ import com.tests.test_case_helper.service.project.utils.ProjectUtils;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
@@ -55,6 +54,20 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         createTestSuiteResponseDTO.setProjectId(project.getId());
         
         return createTestSuiteResponseDTO;
+    }
+
+    @Transactional
+    @Override
+    public TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO) {
+        TestSuite foundTestSuite = testSuiteUtil.getTestSuiteById(id);
+
+        foundTestSuite.setTitle(updateTestSuiteDTO.getTitle());
+        foundTestSuite.setDescription(updateTestSuiteDTO.getDescription());
+        foundTestSuite.setTag(Tag.valueOf(updateTestSuiteDTO.getTag().toUpperCase()));
+
+        TestSuite updatedTestSuite = testSuiteRepository.save(foundTestSuite);
+
+        return testSuiteMapper.toBaseTestSuiteDTO(updatedTestSuite);
     }
 
     @Override

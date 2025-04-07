@@ -42,7 +42,7 @@ public class UserControllerExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationExceptionDTO<UserExceptionDTO> onMethodArgumentNotValidException(UserNotFoundException ex) {
+    public ValidationExceptionDTO<UserExceptionDTO> onUserNotFoundException(UserNotFoundException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()
@@ -54,7 +54,7 @@ public class UserControllerExceptionHandler {
     @ExceptionHandler(UserIsDisabledException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationExceptionDTO<UserExceptionDTO> onMethodArgumentNotValidException(UserIsDisabledException ex) {
+    public ValidationExceptionDTO<UserExceptionDTO> onUserIsDisabledException(UserIsDisabledException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()
@@ -66,7 +66,7 @@ public class UserControllerExceptionHandler {
     @ExceptionHandler(UserIsAlreadyRegisteredException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationExceptionDTO<UserExceptionDTO> onMethodArgumentNotValidException(UserIsAlreadyRegisteredException ex) {
+    public ValidationExceptionDTO<UserExceptionDTO> onUserIsAlreadyRegisteredException(UserIsAlreadyRegisteredException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()

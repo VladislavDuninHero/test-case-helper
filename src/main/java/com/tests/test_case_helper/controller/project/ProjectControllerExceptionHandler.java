@@ -38,7 +38,7 @@ public class ProjectControllerExceptionHandler {
     @ExceptionHandler(InvalidSpecialCharactersException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationExceptionDTO<ProjectExceptionDTO> onMethodArgumentNotValidException(InvalidSpecialCharactersException ex) {
+    public ValidationExceptionDTO<ProjectExceptionDTO> onInvalidSpecialCharacterException(InvalidSpecialCharactersException ex) {
         ProjectExceptionDTO userErrorDTO = new ProjectExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()

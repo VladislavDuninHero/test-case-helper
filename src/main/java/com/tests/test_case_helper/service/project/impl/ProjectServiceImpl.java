@@ -8,6 +8,7 @@ import com.tests.test_case_helper.service.project.utils.ProjectUtils;
 import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.validation.manager.impl.ProjectValidationManager;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,6 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
         );
     }
 
+    @Transactional
     @Override
     public ProjectDTO updateProject(Long projectId, UpdateProjectDTO projectDTO) {
         projectUtils.getProjectById(projectId);

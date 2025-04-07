@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProjectMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "title", target = "title")
     Project toEntity(CreateProjectDTO project);
 
