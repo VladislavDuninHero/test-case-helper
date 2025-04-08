@@ -67,16 +67,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public ProjectDTO updateProject(Long projectId, UpdateProjectDTO projectDTO) {
-        projectUtils.getProjectById(projectId);
+        Project foundProject = projectUtils.getProjectById(projectId);
 
-        Project updateProject = Project
-                .builder()
-                .id(projectId)
-                .title(projectDTO.getTitle())
-                .description(projectDTO.getDescription())
-                .build();
+        foundProject.setId(projectId);
+        foundProject.setTitle(projectDTO.getTitle());
+        foundProject.setDescription(projectDTO.getDescription());
 
-        Project updatedProject = projectRepository.save(updateProject);
+        Project updatedProject = projectRepository.save(foundProject);
 
         return projectMapper.currentProjectToDto(updatedProject);
     }

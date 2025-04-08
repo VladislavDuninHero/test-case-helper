@@ -48,6 +48,18 @@ public class TestSuiteController {
         return ResponseEntity.ok(extendedTestSuiteDTO);
     }
 
+    @GetMapping(Route.API_GET_SLIM_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    public ResponseEntity<TestSuiteDTO> getSlimTestSuite(
+            @PathVariable
+            @NotNull
+            Long id
+    ) {
+        TestSuiteDTO testSuiteDTO = testSuiteService.getSlimTestSuite(id);
+
+        return ResponseEntity.ok(testSuiteDTO);
+    }
+
     @PutMapping(Route.API_UPDATE_ROUTE)
     @PreAuthorize("hasAuthority('UPDATE_TEST_SUITE')")
     public ResponseEntity<TestSuiteDTO> updateTestSuite(

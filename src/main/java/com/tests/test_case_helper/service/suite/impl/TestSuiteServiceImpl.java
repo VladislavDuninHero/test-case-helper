@@ -82,4 +82,16 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                 .build();
     }
 
+    @Override
+    public TestSuiteDTO getSlimTestSuite(Long id) {
+        TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        return TestSuiteDTO.builder()
+                .id(testSuite.getId())
+                .title(testSuite.getTitle())
+                .description(testSuite.getDescription())
+                .tag(testSuite.getTag().name())
+                .build();
+    }
+
 }
