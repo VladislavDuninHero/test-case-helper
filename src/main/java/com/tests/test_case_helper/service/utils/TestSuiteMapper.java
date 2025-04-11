@@ -18,6 +18,7 @@ public interface TestSuiteMapper {
     @Mapping(target = "updated_at", ignore = true)
     TestSuite toEntity(CreateTestSuiteDTO testSuite);
 
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "tag", target = "tag")

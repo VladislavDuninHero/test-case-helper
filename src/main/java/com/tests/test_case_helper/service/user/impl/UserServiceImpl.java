@@ -70,12 +70,15 @@ public class UserServiceImpl implements UserService {
             UserLoginDTO userLoginDTO
     ) {
         String login = userLoginDTO.getLogin();
+        String password = userLoginDTO.getPassword();
 
         User foundUser = userUtils.findUserEntityByLoginAndReturn(login);
 
         if (!foundUser.getIsEnabled()) {
             throw new UserIsDisabledException(ExceptionMessage.USER_IS_DISABLED);
         }
+
+        userUtils.validateUserPassword(password, foundUser.getPassword());
 
         JwtDTO jwtDTO = new JwtDTO(
                 jwtService.generateAccessToken(login)

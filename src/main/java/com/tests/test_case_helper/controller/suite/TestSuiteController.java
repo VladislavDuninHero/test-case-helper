@@ -2,6 +2,7 @@ package com.tests.test_case_helper.controller.suite;
 
 import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.constants.Route;
+import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping(Route.API_TEST_SUITE_ROUTE)
@@ -31,11 +35,18 @@ public class TestSuiteController {
 
         CreateTestSuiteResponseDTO createTestSuiteResponseDTO = testSuiteService.createTestSuite(createTestSuiteDTO);
 
-        return ResponseEntity.ok(createTestSuiteResponseDTO);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createTestSuiteResponseDTO.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createTestSuiteResponseDTO);
     }
 
     @GetMapping(Route.API_GET_TEST_SUITE_ROUTE)
     @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
     public ResponseEntity<ExtendedTestSuiteDTO> getTestSuite(
             @PathVariable
             @NotNull
@@ -50,6 +61,7 @@ public class TestSuiteController {
 
     @GetMapping(Route.API_GET_SLIM_TEST_SUITE_ROUTE)
     @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
     public ResponseEntity<TestSuiteDTO> getSlimTestSuite(
             @PathVariable
             @NotNull
@@ -62,6 +74,7 @@ public class TestSuiteController {
 
     @PutMapping(Route.API_UPDATE_ROUTE)
     @PreAuthorize("hasAuthority('UPDATE_TEST_SUITE')")
+    @Validated
     public ResponseEntity<TestSuiteDTO> updateTestSuite(
             @PathVariable
             @NotNull
@@ -78,14 +91,15 @@ public class TestSuiteController {
 
     @DeleteMapping(Route.API_DELETE_ROUTE)
     @PreAuthorize("hasAuthority('DELETE_TEST_SUITE')")
-    public ResponseEntity<ResponseMessage> deleteTestSuite(
+    @Validated
+    public ResponseEntity<ResponseMessageDTO> deleteTestSuite(
             @PathVariable
             @NotNull
             Long id
     ) {
 
+        testSuiteService.deleteTestSuite(id);
 
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ResponseMessageDTO(ResponseMessage.TEST_SUITE_SUCCESSFULLY_DELETED));
     }
 }

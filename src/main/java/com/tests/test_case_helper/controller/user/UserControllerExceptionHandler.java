@@ -5,10 +5,7 @@ import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
 import com.tests.test_case_helper.dto.exception.UserExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;
-import com.tests.test_case_helper.exceptions.InvalidSpecialCharactersException;
-import com.tests.test_case_helper.exceptions.UserIsAlreadyRegisteredException;
-import com.tests.test_case_helper.exceptions.UserIsDisabledException;
-import com.tests.test_case_helper.exceptions.UserNotFoundException;
+import com.tests.test_case_helper.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -67,6 +64,18 @@ public class UserControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationExceptionDTO<UserExceptionDTO> onUserIsAlreadyRegisteredException(UserIsAlreadyRegisteredException ex) {
+        UserExceptionDTO userErrorDTO = new UserExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(userErrorDTO));
+    }
+
+    @ExceptionHandler(UserLoginDataIsInvalidException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<UserExceptionDTO> onUserLoginDataIsInvalidException(UserLoginDataIsInvalidException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()

@@ -5,6 +5,7 @@ import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;
 import com.tests.test_case_helper.exceptions.InvalidSpecialCharactersException;
+import com.tests.test_case_helper.exceptions.ProjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,11 +40,23 @@ public class ProjectControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationExceptionDTO<ProjectExceptionDTO> onInvalidSpecialCharacterException(InvalidSpecialCharactersException ex) {
-        ProjectExceptionDTO userErrorDTO = new ProjectExceptionDTO(
+        ProjectExceptionDTO error = new ProjectExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()
         );
 
-        return new ValidationExceptionDTO<>(List.of(userErrorDTO));
+        return new ValidationExceptionDTO<>(List.of(error));
+    }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<ProjectExceptionDTO> onProjectNotFoundException(ProjectNotFoundException ex) {
+        ProjectExceptionDTO error = new ProjectExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(error));
     }
 }

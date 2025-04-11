@@ -56,8 +56,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         return createTestSuiteResponseDTO;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO) {
         TestSuite foundTestSuite = testSuiteUtil.getTestSuiteById(id);
 
@@ -80,6 +80,14 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                 .projectId(testSuite.getProject().getId())
                 .testCases(testCaseService.getTestCasesByTestSuiteId(id))
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteTestSuite(Long id) {
+        TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        testSuiteRepository.delete(testSuite);
     }
 
     @Override

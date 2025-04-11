@@ -64,8 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
         );
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ProjectDTO updateProject(Long projectId, UpdateProjectDTO projectDTO) {
         Project foundProject = projectUtils.getProjectById(projectId);
 
@@ -79,6 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public void deleteProject(Long projectId) {
         Project project = projectUtils.getProjectById(projectId);
 

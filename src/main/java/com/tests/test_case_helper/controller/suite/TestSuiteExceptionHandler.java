@@ -1,8 +1,12 @@
 package com.tests.test_case_helper.controller.suite;
 
 import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
+import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
+import com.tests.test_case_helper.dto.exception.TestSuiteExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;
+import com.tests.test_case_helper.exceptions.InvalidSpecialCharactersException;
+import com.tests.test_case_helper.exceptions.TestSuiteNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,5 +35,17 @@ public class TestSuiteExceptionHandler {
                 .toList();
 
         return new ValidationExceptionDTO<>(errors);
+    }
+
+    @ExceptionHandler(TestSuiteNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onTestSuiteNotFoundException(TestSuiteNotFoundException ex) {
+        TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
     }
 }

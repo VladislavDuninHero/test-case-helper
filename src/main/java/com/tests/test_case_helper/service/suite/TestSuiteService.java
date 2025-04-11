@@ -6,5 +6,6 @@ public interface TestSuiteService {
     CreateTestSuiteResponseDTO createTestSuite(CreateTestSuiteDTO createTestSuiteDTO);
     TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO);
     ExtendedTestSuiteDTO getTestSuite(Long id);
+    void deleteTestSuite(Long id);
     TestSuiteDTO getSlimTestSuite(Long id);
 }
