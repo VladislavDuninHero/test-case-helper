@@ -3,6 +3,7 @@ package com.tests.test_case_helper.service.cases.impl;
 import com.tests.test_case_helper.dto.cases.CreateTestCaseDTO;
 import com.tests.test_case_helper.dto.cases.CreateTestCaseResponseDTO;
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
+import com.tests.test_case_helper.dto.cases.UpdateTestCaseDTO;
 import com.tests.test_case_helper.entity.TestSuite;
 import com.tests.test_case_helper.entity.cases.TestCase;
 import com.tests.test_case_helper.repository.TestCaseRepository;
@@ -11,6 +12,7 @@ import com.tests.test_case_helper.service.cases.utils.TestCaseUtils;
 import com.tests.test_case_helper.service.suite.utils.TestSuiteUtils;
 import com.tests.test_case_helper.service.utils.cases.TestCaseMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,67 @@ public class TestCaseServiceImpl implements TestCaseService {
         createTestCaseResponseDTO.setTestSuiteId(testSuite.getId());
 
         return createTestCaseResponseDTO;
+    }
+
+    @Override
+    public TestCaseDTO getTestCase(Long id) {
+        TestCase foundTestCase = testCaseUtils.getTestCaseById(id);
+
+        return TestCaseDTO.builder()
+                .id(foundTestCase.getId())
+                .title(foundTestCase.getTitle())
+                .testCaseData(testCaseUtils.testCaseDataMapperToDTO(foundTestCase.getTestCaseData()))
+                .preconditions(testCaseUtils.testCasePreconditionMapperToDTO(foundTestCase.getTestCasePrecondition()))
+                .steps(testCaseUtils.testCaseStepMapperToDTO(foundTestCase.getSteps()))
+                .expectedResult(testCaseUtils.testCaseExpectedResultMapperToDTO(foundTestCase.getExpectedResult()))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public TestCaseDTO updateTestCase(Long id, UpdateTestCaseDTO updateTestCaseDTO) {
+        TestCase foundTestCase = testCaseUtils.getTestCaseById(id);
+
+        foundTestCase.setTitle(updateTestCaseDTO.getTitle());
+
+        foundTestCase.getTestCaseData().clear();
+        foundTestCase.getTestCaseData()
+                .addAll(testCaseUtils.testCaseDataMapper(updateTestCaseDTO.getTestCaseData()));
+
+        foundTestCase.getTestCasePrecondition().clear();
+        foundTestCase.getTestCasePrecondition()
+                .addAll(testCaseUtils.testCasePreconditionMapper(updateTestCaseDTO.getPreconditions()));
+
+        foundTestCase.getSteps().clear();
+        foundTestCase.getSteps().addAll(testCaseUtils.testCaseStepMapper(updateTestCaseDTO.getSteps()));
+
+        foundTestCase.getExpectedResult().clear();
+        foundTestCase.getExpectedResult()
+                .addAll(testCaseUtils.testCaseExpectedResultMapper(updateTestCaseDTO.getExpectedResult()));
+
+        TestCase updatedTestCase = testCaseRepository.save(foundTestCase);
+
+        return TestCaseDTO.builder()
+                .id(updatedTestCase.getId())
+                .title(updatedTestCase.getTitle())
+                .testCaseData(testCaseUtils.testCaseDataMapperToDTO(updatedTestCase.getTestCaseData()))
+                .preconditions(testCaseUtils.testCasePreconditionMapperToDTO(updatedTestCase.getTestCasePrecondition()))
+                .steps(testCaseUtils.testCaseStepMapperToDTO(updatedTestCase.getSteps()))
+                .expectedResult(testCaseUtils.testCaseExpectedResultMapperToDTO(updatedTestCase.getExpectedResult()))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteTestCase(Long id) {
+        TestCase foundTestCase = testCaseUtils.getTestCaseById(id);
+
+        foundTestCase.getTestCaseData().clear();
+        foundTestCase.getTestCasePrecondition().clear();
+        foundTestCase.getSteps().clear();
+        foundTestCase.getExpectedResult().clear();
+
+        testCaseRepository.delete(foundTestCase);
     }
 
     @Override

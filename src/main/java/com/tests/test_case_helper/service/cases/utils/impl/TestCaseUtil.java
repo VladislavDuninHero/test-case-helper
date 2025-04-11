@@ -1,13 +1,13 @@
 package com.tests.test_case_helper.service.cases.utils.impl;
 
+import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.cases.data.TestCaseDataDTO;
 import com.tests.test_case_helper.dto.cases.expected.ExpectedResultDTO;
 import com.tests.test_case_helper.dto.cases.precondition.PreconditionDTO;
 import com.tests.test_case_helper.dto.cases.steps.StepDTO;
-import com.tests.test_case_helper.entity.cases.TestCaseData;
-import com.tests.test_case_helper.entity.cases.TestCaseExpectedResult;
-import com.tests.test_case_helper.entity.cases.TestCasePrecondition;
-import com.tests.test_case_helper.entity.cases.TestCaseStep;
+import com.tests.test_case_helper.entity.cases.*;
+import com.tests.test_case_helper.exceptions.TestCaseNotFoundException;
+import com.tests.test_case_helper.repository.TestCaseRepository;
 import com.tests.test_case_helper.service.cases.utils.TestCaseUtils;
 import com.tests.test_case_helper.service.utils.cases.ExpectedResultMapper;
 import com.tests.test_case_helper.service.utils.cases.PreconditionMapper;
@@ -16,6 +16,7 @@ import com.tests.test_case_helper.service.utils.cases.TestCaseDataMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TestCaseUtil implements TestCaseUtils {
@@ -24,17 +25,19 @@ public class TestCaseUtil implements TestCaseUtils {
     private final PreconditionMapper preconditionMapper;
     private final StepMapper stepMapper;
     private final ExpectedResultMapper expectedResultMapper;
+    private final TestCaseRepository testCaseRepository;
 
     public TestCaseUtil(
             TestCaseDataMapper testCaseDataMapper,
             PreconditionMapper preconditionMapper,
             StepMapper stepMapper,
-            ExpectedResultMapper expectedResultMapper
-    ) {
+            ExpectedResultMapper expectedResultMapper,
+            TestCaseRepository testCaseRepository) {
         this.testCaseDataMapper = testCaseDataMapper;
         this.preconditionMapper = preconditionMapper;
         this.stepMapper = stepMapper;
         this.expectedResultMapper = expectedResultMapper;
+        this.testCaseRepository = testCaseRepository;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return testCaseDataDTO
                 .stream()
                 .map(testCaseDataMapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -50,7 +53,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return testCaseData
                 .stream()
                 .map(testCaseDataMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,7 +61,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return preconditionDTO
                 .stream()
                 .map(preconditionMapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -66,7 +69,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return preconditions
                 .stream()
                 .map(preconditionMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -74,7 +77,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return stepDTO
                 .stream()
                 .map(stepMapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,7 +85,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return steps
                 .stream()
                 .map(stepMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -90,7 +93,7 @@ public class TestCaseUtil implements TestCaseUtils {
         return expectedResultDTO
                 .stream()
                 .map(expectedResultMapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -98,6 +101,12 @@ public class TestCaseUtil implements TestCaseUtils {
         return expectedResults
                 .stream()
                 .map(expectedResultMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TestCase getTestCaseById(Long id) {
+        return testCaseRepository.getTestCaseById(id)
+                .orElseThrow(() -> new TestCaseNotFoundException(ExceptionMessage.TEST_CASE_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 }

@@ -1,0 +1,37 @@
+package com.tests.test_case_helper.dto.cases;
+
+import com.tests.test_case_helper.dto.cases.data.TestCaseDataDTO;
+import com.tests.test_case_helper.dto.cases.expected.ExpectedResultDTO;
+import com.tests.test_case_helper.dto.cases.precondition.PreconditionDTO;
+import com.tests.test_case_helper.dto.cases.steps.StepDTO;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.util.List;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class UpdateTestCaseDTO {
+
+    @NotNull
+    @NotEmpty
+    @Size(min = 1, max = 100)
+    private String title;
+
+    @NotNull
+    private List<TestCaseDataDTO> testCaseData;
+
+    @NotNull
+    private List<PreconditionDTO> preconditions;
+
+    @NotNull
+    private List<StepDTO> steps;
+
+    @NotNull
+    private List<ExpectedResultDTO> expectedResult;
+}

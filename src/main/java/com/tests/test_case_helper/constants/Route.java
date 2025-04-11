@@ -14,6 +14,7 @@ public final class Route {
     public static final String API_CREATE_ROUTE = "/create";
     public static final String API_GET_PROJECT_ROUTE = "/{id}";
     public static final String API_GET_TEST_SUITE_ROUTE = "/{id}";
+    public static final String API_GET_ROUTE = "/{id}";
     public static final String API_GET_SLIM_TEST_SUITE_ROUTE = "/{id}/slim";
     public static final String API_DELETE_ROUTE = "/{id}/delete";
     public static final String API_UPDATE_ROUTE = "/{id}/update";

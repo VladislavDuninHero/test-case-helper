@@ -8,7 +8,8 @@ public final class ExceptionMessage {
     public static final String INVALID_SPECIAL_CHARACTERS_EXCEPTION_MESSAGE = "Invalid special characters";
     public static final String PROJECT_NOT_FOUND_EXCEPTION_MESSAGE = "Project not found";
     public static final String TAG_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
-    public static final String ROLE_NOT_FOUND_EXCEPTION_MESSAGE = "Tag not found";
+    public static final String ROLE_NOT_FOUND_EXCEPTION_MESSAGE = "Role not found";
+    public static final String TEST_CASE_NOT_FOUND_EXCEPTION_MESSAGE = "Test-case not found";
     public static final String TEST_SUITE_NOT_FOUND_EXCEPTION_MESSAGE = "Test-suite not found";
     public static final String USER_IS_DISABLED = "User is disabled";
     public static final String USER_LOGIN_DATA_IS_INVALID = "Invalid password or login";

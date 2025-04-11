@@ -4,10 +4,7 @@ import com.tests.test_case_helper.dto.cases.data.TestCaseDataDTO;
 import com.tests.test_case_helper.dto.cases.expected.ExpectedResultDTO;
 import com.tests.test_case_helper.dto.cases.precondition.PreconditionDTO;
 import com.tests.test_case_helper.dto.cases.steps.StepDTO;
-import com.tests.test_case_helper.entity.cases.TestCaseData;
-import com.tests.test_case_helper.entity.cases.TestCaseExpectedResult;
-import com.tests.test_case_helper.entity.cases.TestCasePrecondition;
-import com.tests.test_case_helper.entity.cases.TestCaseStep;
+import com.tests.test_case_helper.entity.cases.*;
 
 import java.util.List;
 
@@ -20,5 +17,5 @@ public interface TestCaseUtils {
     List<StepDTO> testCaseStepMapperToDTO(List<TestCaseStep> steps);
     List<TestCaseExpectedResult> testCaseExpectedResultMapper(List<ExpectedResultDTO> expectedResultDTO);
     List<ExpectedResultDTO> testCaseExpectedResultMapperToDTO(List<TestCaseExpectedResult> expectedResults);
-
+    TestCase getTestCaseById(Long id);
 }

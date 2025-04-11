@@ -41,7 +41,7 @@ public class TestCase {
     @JoinColumn(name = "test_case_id")
     private List<TestCaseExpectedResult> expectedResult;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_suit_id")
     private TestSuite testSuite;
 

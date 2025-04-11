@@ -20,4 +20,6 @@ public class TestCaseData {
 
     @Column(name = "step")
     private String step;
+
+
 }
