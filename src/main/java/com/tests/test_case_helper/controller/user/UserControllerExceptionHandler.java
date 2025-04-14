@@ -1,7 +1,6 @@
 package com.tests.test_case_helper.controller.user;
 
 import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
-import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
 import com.tests.test_case_helper.dto.exception.UserExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;

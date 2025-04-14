@@ -8,7 +8,6 @@ import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import com.tests.test_case_helper.dto.cases.UpdateTestCaseDTO;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.service.cases.TestCaseService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
