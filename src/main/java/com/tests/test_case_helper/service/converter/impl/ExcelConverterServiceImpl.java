@@ -1,14 +1,21 @@
 package com.tests.test_case_helper.service.converter.impl;
 
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
+import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
+import com.tests.test_case_helper.dto.suite.TestSuiteDTO;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.entity.TestSuite;
+import com.tests.test_case_helper.repository.TestSuiteRepository;
 import com.tests.test_case_helper.service.cases.TestCaseService;
 import com.tests.test_case_helper.service.converter.ExcelConverterService;
 import com.tests.test_case_helper.service.converter.util.ExcelConverterServiceUtil;
 import com.tests.test_case_helper.service.project.utils.impl.ProjectUtil;
+import com.tests.test_case_helper.service.utils.ProjectMapper;
+import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,15 +26,24 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
     private final ProjectUtil projectUtil;
     private final TestCaseService testCaseService;
     private final ExcelConverterServiceUtil excelConverterServiceUtil;
+    private final ProjectMapper projectMapper;
+    private final TestSuiteMapper testSuiteMapper;
+    private final TestSuiteRepository testSuiteRepository;
 
     public ExcelConverterServiceImpl(
             ProjectUtil projectUtil,
             TestCaseService testCaseService,
-            ExcelConverterServiceUtil excelConverterServiceUtil
+            ExcelConverterServiceUtil excelConverterServiceUtil,
+            ProjectMapper projectMapper,
+            TestSuiteMapper testSuiteMapper,
+            TestSuiteRepository testSuiteRepository
     ) {
         this.projectUtil = projectUtil;
         this.testCaseService = testCaseService;
         this.excelConverterServiceUtil = excelConverterServiceUtil;
+        this.projectMapper = projectMapper;
+        this.testSuiteMapper = testSuiteMapper;
+        this.testSuiteRepository = testSuiteRepository;
     }
 
     @Override
@@ -40,11 +56,31 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
                 .collect(
                         Collectors.toMap(
                                 TestSuite::getTitle,
-                        testSuite -> testCaseService.getTestCasesByTestSuiteId(testSuite.getId())
+                                testSuite -> testCaseService.getTestCasesByTestSuiteId(testSuite.getId())
                         )
                 );
 
         return excelConverterServiceUtil.convertAndWriteToExcel(testSuitesWithTestCases);
+    }
+
+    @Override
+    @Transactional
+    public ExtendedProjectDTO convertFromExcel(InputStream excelFileInputStream, Long projectId) {
+        List<TestSuite> testSuites = excelConverterServiceUtil.parseFromExcel(excelFileInputStream, projectId);
+
+        Project project = projectUtil.getProjectById(projectId);
+
+        List<TestSuite> savedTestSuites = testSuiteRepository.saveAll(testSuites);
+
+        List<TestSuiteDTO> mappedTestSuites = savedTestSuites.stream()
+                .map(testSuiteMapper::toBaseTestSuiteDTO)
+                .toList();
+
+        return new ExtendedProjectDTO(
+                project.getTitle(),
+                project.getDescription(),
+                mappedTestSuites
+        );
     }
 
 }

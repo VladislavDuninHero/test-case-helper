@@ -13,4 +13,5 @@ public final class ExceptionMessage {
     public static final String TEST_SUITE_NOT_FOUND_EXCEPTION_MESSAGE = "Test-suite not found";
     public static final String USER_IS_DISABLED = "User is disabled";
     public static final String USER_LOGIN_DATA_IS_INVALID = "Invalid password or login";
+    public static final String EXCEL_FILE_PARSED_EXCEPTION_MESSAGE = "Excel file parsed with error";
 }

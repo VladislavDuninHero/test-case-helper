@@ -21,13 +21,9 @@ public class UpdateTestSuiteDTO {
     @Size(min = 1, max = 100)
     private String title;
 
-    @NotNull
-    @NotEmpty
     @Size(min = 1, max = 200)
     private String description;
 
-    @NotNull
-    @NotEmpty
     @EnumValidate(enumClass = Tag.class, message = ExceptionMessage.TAG_NOT_FOUND_EXCEPTION_MESSAGE)
-    private String tag;
+    private String tag = Tag.NOT_ASSIGNED.name();
 }

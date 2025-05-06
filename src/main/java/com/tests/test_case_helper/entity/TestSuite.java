@@ -47,4 +47,18 @@ public class TestSuite {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updated_at;
+
+    @Override
+    public String toString() {
+        return "TestSuite{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", tag=" + tag +
+                ", testsCases=" + testsCases +
+                ", project=" + project +
+                ", created_at=" + created_at +
+                ", updated_at=" + updated_at +
+                '}';
+    }
 }

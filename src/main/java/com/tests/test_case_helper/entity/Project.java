@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,9 +28,13 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "project_id")
-    private List<TestSuite> testsSuites;
+    @OneToMany(
+            mappedBy = "project",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true
+    )
+    private List<TestSuite> testsSuites = new ArrayList<>();
 
     @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
