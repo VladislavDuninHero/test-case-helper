@@ -1,6 +1,5 @@
 package com.tests.test_case_helper.dto.project;
 
-import com.tests.test_case_helper.dto.suite.ExtendedTestSuiteDTO;
 import com.tests.test_case_helper.dto.suite.TestSuiteDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

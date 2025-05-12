@@ -6,14 +6,12 @@ import com.tests.test_case_helper.dto.project.ExtendedProjectDTO;
 import com.tests.test_case_helper.exceptions.ExcelFileParsedException;
 import com.tests.test_case_helper.service.converter.ExcelConverterService;
 import jakarta.validation.constraints.NotNull;
-import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping(Route.API_CONVERTERS_ROUTE)

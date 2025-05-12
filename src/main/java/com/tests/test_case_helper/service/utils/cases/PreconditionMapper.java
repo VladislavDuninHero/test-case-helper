@@ -1,8 +1,6 @@
 package com.tests.test_case_helper.service.utils.cases;
 
-import com.tests.test_case_helper.dto.cases.data.TestCaseDataDTO;
 import com.tests.test_case_helper.dto.cases.precondition.PreconditionDTO;
-import com.tests.test_case_helper.entity.cases.TestCaseData;
 import com.tests.test_case_helper.entity.cases.TestCasePrecondition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
