@@ -26,7 +26,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Set<Permission> permissions;
 
