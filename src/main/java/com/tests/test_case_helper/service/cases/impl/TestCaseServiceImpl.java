@@ -11,6 +11,7 @@ import com.tests.test_case_helper.service.cases.TestCaseService;
 import com.tests.test_case_helper.service.cases.utils.TestCaseUtils;
 import com.tests.test_case_helper.service.suite.utils.TestSuiteUtils;
 import com.tests.test_case_helper.service.utils.cases.TestCaseMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,6 +119,28 @@ public class TestCaseServiceImpl implements TestCaseService {
         foundTestCase.getExpectedResult().clear();
 
         testCaseRepository.delete(foundTestCase);
+    }
+
+    @Override
+    public List<TestCaseDTO> getTestCasesByTestSuiteId(Long testSuiteId, Pageable pageable) {
+        List<TestCase> testCases = testCaseRepository.getAllTestCasesByTestSuiteId(testSuiteId, pageable);
+
+        List<TestCaseDTO> mappedTestCases = new ArrayList<>();
+
+        for (TestCase testCase : testCases) {
+            TestCaseDTO testCaseDTO = TestCaseDTO.builder()
+                    .id(testCase.getId())
+                    .title(testCase.getTitle())
+                    .testCaseData(testCaseUtils.testCaseDataMapperToDTO(testCase.getTestCaseData()))
+                    .preconditions(testCaseUtils.testCasePreconditionMapperToDTO(testCase.getTestCasePrecondition()))
+                    .steps(testCaseUtils.testCaseStepMapperToDTO(testCase.getSteps()))
+                    .expectedResult(testCaseUtils.testCaseExpectedResultMapperToDTO(testCase.getExpectedResult()))
+                    .build();
+
+            mappedTestCases.add(testCaseDTO);
+        }
+
+        return mappedTestCases;
     }
 
     @Override

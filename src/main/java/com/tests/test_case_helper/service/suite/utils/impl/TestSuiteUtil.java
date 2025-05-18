@@ -5,6 +5,8 @@ import com.tests.test_case_helper.entity.TestSuite;
 import com.tests.test_case_helper.exceptions.TestSuiteNotFoundException;
 import com.tests.test_case_helper.repository.TestSuiteRepository;
 import com.tests.test_case_helper.service.suite.utils.TestSuiteUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
