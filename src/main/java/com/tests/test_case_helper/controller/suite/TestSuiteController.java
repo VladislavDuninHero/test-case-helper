@@ -7,6 +7,7 @@ import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -51,10 +52,10 @@ public class TestSuiteController {
             @PathVariable
             @NotNull
             @Positive
-            Long id
+            Long id,
+            Pageable pageable
     ) {
-
-        ExtendedTestSuiteDTO extendedTestSuiteDTO = testSuiteService.getTestSuite(id);
+        ExtendedTestSuiteDTO extendedTestSuiteDTO = testSuiteService.getTestSuite(id, pageable);
 
         return ResponseEntity.ok(extendedTestSuiteDTO);
     }

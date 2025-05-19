@@ -11,6 +11,7 @@ import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -79,6 +80,18 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                 .description(testSuite.getDescription())
                 .projectId(testSuite.getProject().getId())
                 .testCases(testCaseService.getTestCasesByTestSuiteId(id))
+                .build();
+    }
+
+    @Override
+    public ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable) {
+        TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        return ExtendedTestSuiteDTO.builder()
+                .title(testSuite.getTitle())
+                .description(testSuite.getDescription())
+                .projectId(testSuite.getProject().getId())
+                .testCases(testCaseService.getTestCasesByTestSuiteId(id, pageable))
                 .build();
     }
 
