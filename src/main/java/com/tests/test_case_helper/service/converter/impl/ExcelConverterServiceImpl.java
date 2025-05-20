@@ -54,9 +54,12 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
                 .getTestsSuites()
                 .stream()
                 .collect(
-                        Collectors.toMap(
+                        Collectors.groupingBy(
                                 TestSuite::getTitle,
-                                testSuite -> testCaseService.getTestCasesByTestSuiteId(testSuite.getId())
+                                Collectors.mapping(
+                                testSuite -> testCaseService.getTestCasesByTestSuiteId(testSuite.getId()),
+                                        Collectors.flatMapping(List::stream, Collectors.toList())
+                                )
                         )
                 );
 
