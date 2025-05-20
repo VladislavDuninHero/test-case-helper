@@ -13,6 +13,7 @@ import java.util.List;
 public class ExtendedTestSuiteDTO {
     private String title;
     private String description;
+    private int numberOfTestCases;
     private List<TestCaseDTO> testCases;
     private Long projectId;
 }

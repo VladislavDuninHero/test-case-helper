@@ -1,5 +1,6 @@
 package com.tests.test_case_helper.service.suite.impl;
 
+import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.entity.TestSuite;
@@ -13,6 +14,8 @@ import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -74,24 +77,28 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+        List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id);
 
         return ExtendedTestSuiteDTO.builder()
                 .title(testSuite.getTitle())
                 .description(testSuite.getDescription())
                 .projectId(testSuite.getProject().getId())
-                .testCases(testCaseService.getTestCasesByTestSuiteId(id))
+                .numberOfTestCases(testSuite.getTestsCases().size())
+                .testCases(testCases)
                 .build();
     }
 
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+        List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id, pageable);
 
         return ExtendedTestSuiteDTO.builder()
                 .title(testSuite.getTitle())
                 .description(testSuite.getDescription())
                 .projectId(testSuite.getProject().getId())
-                .testCases(testCaseService.getTestCasesByTestSuiteId(id, pageable))
+                .numberOfTestCases(testSuite.getTestsCases().size())
+                .testCases(testCases)
                 .build();
     }
 
