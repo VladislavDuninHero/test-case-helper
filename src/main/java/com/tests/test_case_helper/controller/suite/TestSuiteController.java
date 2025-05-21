@@ -102,4 +102,17 @@ public class TestSuiteController {
 
         return ResponseEntity.ok(new ResponseMessageDTO(ResponseMessage.TEST_SUITE_SUCCESSFULLY_DELETED));
     }
+
+    @PostMapping(Route.API_RUN_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<ExtendedTestSuiteDTO> runTestSuite(
+            @PathVariable
+            @NotNull
+            Long id
+    ) {
+        ExtendedTestSuiteDTO runTestSuite = testSuiteService.runTestSuite(id);
+
+        return ResponseEntity.ok(runTestSuite);
+    }
 }

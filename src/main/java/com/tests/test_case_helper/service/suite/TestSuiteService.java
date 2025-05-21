@@ -7,5 +7,6 @@ public interface TestSuiteService {
     TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO);
     ExtendedTestSuiteDTO getTestSuite(Long id);
     void deleteTestSuite(Long id);
+    ExtendedTestSuiteDTO runTestSuite(Long id);
     TestSuiteDTO getSlimTestSuite(Long id);
 }
