@@ -9,5 +9,6 @@ public interface TestSuiteService {
     ExtendedTestSuiteDTO getTestSuite(Long id);
     ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable);
     void deleteTestSuite(Long id);
+    ExtendedTestSuiteDTO runTestSuite(Long id);
     TestSuiteDTO getSlimTestSuite(Long id);
 }
