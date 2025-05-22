@@ -285,7 +285,7 @@ public class ExcelConverterServiceUtilImpl implements ExcelConverterServiceUtil 
 
             }
 
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new ExcelFileParsedException("Parsed exception");
         }
 
