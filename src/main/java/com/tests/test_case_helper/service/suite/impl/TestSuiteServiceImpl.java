@@ -111,6 +111,11 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
+    public ExtendedTestSuiteDTO runTestSuite(Long id) {
+        return null;
+    }
+
+    @Override
     public TestSuiteDTO getSlimTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
 

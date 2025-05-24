@@ -33,7 +33,7 @@ public class TestSuite {
     @Enumerated(EnumType.STRING)
     private Tag tag;
 
-    @OneToMany(mappedBy = "testSuite", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "testSuite", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TestCase> testsCases;
 
     @ManyToOne(fetch = FetchType.LAZY)

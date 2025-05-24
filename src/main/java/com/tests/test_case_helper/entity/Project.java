@@ -31,7 +31,7 @@ public class Project {
     @OneToMany(
             mappedBy = "project",
             cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             orphanRemoval = true
     )
     private List<TestSuite> testsSuites = new ArrayList<>();
