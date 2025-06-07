@@ -11,7 +11,9 @@ import com.tests.test_case_helper.service.project.utils.ProjectUtils;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import com.tests.test_case_helper.service.utils.cache.EvictService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,22 +28,26 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final TestSuiteMapper testSuiteMapper;
     private final TestSuiteUtil testSuiteUtil;
     private final TestCaseService testCaseService;
+    private final EvictService evictService;
 
     public TestSuiteServiceImpl(
             TestSuiteRepository testSuiteRepository,
             ProjectUtils projectUtils,
             TestSuiteMapper testSuiteMapper,
             TestSuiteUtil testSuiteUtil,
-            TestCaseService testCaseService
+            TestCaseService testCaseService,
+            EvictService evictService
     ) {
         this.testSuiteRepository = testSuiteRepository;
         this.projectUtils = projectUtils;
         this.testSuiteMapper = testSuiteMapper;
         this.testSuiteUtil = testSuiteUtil;
         this.testCaseService = testCaseService;
+        this.evictService = evictService;
     }
 
     @Override
+    @CacheEvict(value = "project", key = "#createTestSuiteDTO.projectId")
     public CreateTestSuiteResponseDTO createTestSuite(CreateTestSuiteDTO createTestSuiteDTO) {
         Project project = projectUtils.getProjectById(createTestSuiteDTO.getProjectId());
 
@@ -65,6 +71,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     public TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO) {
         TestSuite foundTestSuite = testSuiteUtil.getTestSuiteById(id);
 
+        evictService.evictProjectCache(foundTestSuite.getProject().getId());
+
         foundTestSuite.setTitle(updateTestSuiteDTO.getTitle());
         foundTestSuite.setDescription(updateTestSuiteDTO.getDescription());
         foundTestSuite.setTag(Tag.valueOf(updateTestSuiteDTO.getTag().toUpperCase()));
@@ -77,6 +85,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
+
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id);
 
         return ExtendedTestSuiteDTO.builder()
@@ -91,6 +102,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
+
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id, pageable);
 
         return ExtendedTestSuiteDTO.builder()
@@ -106,6 +120,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Transactional
     public void deleteTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
 
         testSuiteRepository.delete(testSuite);
     }

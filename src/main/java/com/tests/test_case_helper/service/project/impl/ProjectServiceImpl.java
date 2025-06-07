@@ -9,11 +9,16 @@ import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.validation.manager.impl.ProjectValidationManager;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@EnableCaching
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -27,7 +32,8 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectValidationManager projectValidationManager,
             ProjectMapper projectMapper,
             ProjectUtils projectUtils,
-            TestSuiteMapper testSuiteMapper) {
+            TestSuiteMapper testSuiteMapper
+    ) {
         this.projectRepository = projectRepository;
         this.projectValidationManager = projectValidationManager;
         this.projectMapper = projectMapper;
@@ -36,6 +42,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @CacheEvict(value = "projects", allEntries = true)
     public CreateProjectResponseDTO createProject(CreateProjectDTO createProjectDTO) {
         projectValidationManager.validate(createProjectDTO);
 
@@ -47,6 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable(value = "projects", key = "'all_projects'")
     public List<ProjectDTO> getAllProjects() {
         List<Project> projects = projectRepository.findAll();
 
@@ -54,6 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable(value = "project", key = "#projectId")
     public ExtendedProjectDTO getProject(Long projectId) {
         Project project = projectUtils.getProjectById(projectId);
 
@@ -66,6 +75,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(
+                    value = "project",
+                    key = "#projectId",
+                    allEntries = true,
+                    condition = "#projectDTO.title != null || #projectDTO.description != null"
+            ),
+            @CacheEvict(
+                    value = "projects",
+                    allEntries = true,
+                    condition = "#projectDTO.title != null || #projectDTO.description != null"
+            )
+    })
     public ProjectDTO updateProject(Long projectId, UpdateProjectDTO projectDTO) {
         Project foundProject = projectUtils.getProjectById(projectId);
 
@@ -80,6 +102,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "project", key = "#projectId"),
+            @CacheEvict(value = "projects", allEntries = true)
+    })
     public void deleteProject(Long projectId) {
         Project project = projectUtils.getProjectById(projectId);
 

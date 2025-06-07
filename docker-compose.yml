@@ -8,15 +8,13 @@ services:
       MYSQL_ROOT_HOST: '%'
     ports:
       - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_PASSWORD}"]
       interval: 5s
       timeout: 10s
-      retries: 5
+      retries: 1
 
   app:
     build: .
@@ -29,12 +27,29 @@ services:
       ADMIN_TOKEN: ${ADMIN_TOKEN}
       APPLICATION_DEV_URL: ${APPLICATION_DEV_URL}
       ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     ports:
       - "4040:4040"
     depends_on:
       mysql:
-        condition: service_healthy
+        condition: service_started
+      redis:
+        condition: service_started
     restart: unless-stopped
 
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 volumes:
-  mysql_data:
+  redis_data:
