@@ -17,7 +17,6 @@ public class EvictService {
         Cache cache = cacheManager.getCache("project");
 
         if (cache != null) {
-            System.out.println(cache.getName());
             cache.evict(projectId);
         }
     }
