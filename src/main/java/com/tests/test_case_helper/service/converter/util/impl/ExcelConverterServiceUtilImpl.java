@@ -1,10 +1,11 @@
 package com.tests.test_case_helper.service.converter.util.impl;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
-import com.tests.test_case_helper.dto.cases.data.TestCaseDataDTO;
-import com.tests.test_case_helper.dto.cases.expected.ExpectedResultDTO;
-import com.tests.test_case_helper.dto.cases.precondition.PreconditionDTO;
-import com.tests.test_case_helper.dto.cases.steps.StepDTO;
 import com.tests.test_case_helper.entity.Project;
 import com.tests.test_case_helper.entity.TestSuite;
 import com.tests.test_case_helper.entity.cases.*;
@@ -12,9 +13,10 @@ import com.tests.test_case_helper.enums.Tag;
 import com.tests.test_case_helper.exceptions.ExcelFileParsedException;
 import com.tests.test_case_helper.service.converter.util.ExcelConverterServiceUtil;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -33,285 +35,219 @@ public class ExcelConverterServiceUtilImpl implements ExcelConverterServiceUtil 
     public ExcelConverterServiceUtilImpl(ProjectUtils projectUtils) {
         this.projectUtils = projectUtils;
     }
-    
+
     @Override
     public byte[] convertAndWriteToExcel(Map<String, List<TestCaseDTO>> testSuitesAndTestCases) {
-        try {
-            try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-                XSSFSheet sheet = workbook.createSheet("project");
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-                int currentRow = 0;
+            WriteCellStyle testSuiteTitleCellStyle = new WriteCellStyle();
+            testSuiteTitleCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+            testSuiteTitleCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+            setBorderCellStyle(testSuiteTitleCellStyle, BorderStyle.THICK);
 
-                for (Map.Entry<String, List<TestCaseDTO>> entry : testSuitesAndTestCases.entrySet()) {
-                    Row testSuiteRow = sheet.createRow(currentRow);
-                    Cell testSuiteAnchor = testSuiteRow.createCell(0);
-                    Cell titleSuiteCell = testSuiteRow.createCell(1);
+            WriteCellStyle headerCellStyle = new WriteCellStyle();
+            headerCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+            setBorderCellStyle(headerCellStyle, BorderStyle.THICK);
 
-                    CellStyle testSuiteTitleCellStyle = workbook.createCellStyle();
+            WriteCellStyle contentCellStyle = new WriteCellStyle();
+            contentCellStyle.setWrapped(true);
+            contentCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+            setBorderCellStyle(contentCellStyle, BorderStyle.THIN);
 
-                    testSuiteTitleCellStyle.setBorderTop(BorderStyle.THICK);
-                    testSuiteTitleCellStyle.setBorderBottom(BorderStyle.THICK);
-                    testSuiteTitleCellStyle.setBorderLeft(BorderStyle.THICK);
-                    testSuiteTitleCellStyle.setBorderRight(BorderStyle.THICK);
-                    testSuiteTitleCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-                    testSuiteTitleCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            // Создаем список данных для записи
+            List<List<Object>> data = new ArrayList<>();
+            List<WriteCellStyle> rowStyles = new ArrayList<>();
 
-                    titleSuiteCell.setCellStyle(testSuiteTitleCellStyle);
-                    testSuiteAnchor.setCellStyle(testSuiteTitleCellStyle);
+            for (Map.Entry<String, List<TestCaseDTO>> entry : testSuitesAndTestCases.entrySet()) {
+                // Добавляем строку тест-сьюта
+                data.add(Arrays.asList("Test-suite:", entry.getKey()));
+                rowStyles.add(testSuiteTitleCellStyle);
 
-                    testSuiteAnchor.setCellValue("Test-suite:");
-                    titleSuiteCell.setCellValue(entry.getKey());
+                data.add(Arrays.asList("ID", "Title", "Testing data", "Precondition", "Steps", "Expected result"));
+                rowStyles.add(headerCellStyle);
 
-                    currentRow++;
+                for (TestCaseDTO testCaseDTO : entry.getValue()) {
+                    List<Object> row = new ArrayList<>();
+                    row.add(testCaseDTO.getId());
+                    row.add(testCaseDTO.getTitle());
 
-                    Row testSuiteHeadersRow = sheet.createRow(currentRow);
-
-                    String[] headers = {"ID", "Title", "Testing data", "Precondition", "Steps", "Expected result"};
-                    for (int headIndex = 0; headIndex < headers.length; headIndex++) {
-                        sheet.autoSizeColumn(headIndex);
+                    StringBuilder testDataBuilder = new StringBuilder();
+                    for (int i = 0; i < testCaseDTO.getTestCaseData().size(); i++) {
+                        testDataBuilder.append(i + 1).append(". ")
+                                .append(testCaseDTO.getTestCaseData().get(i).getStep());
+                        if (i < testCaseDTO.getTestCaseData().size() - 1) {
+                            testDataBuilder.append("\n");
+                        }
                     }
+                    row.add(testDataBuilder.toString());
 
-                    for (int i = 0; i < headers.length; i++) {
-                        Cell headerCell = testSuiteHeadersRow.createCell(i);
-
-                        CellStyle headerCellStyle = workbook.createCellStyle();
-
-                        setBorderCellStyle(headerCellStyle, BorderStyle.THICK);
-
-                        headerCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-                        headerCell.setCellStyle(headerCellStyle);
-
-                        headerCell.setCellValue(headers[i]);
+                    // Preconditions
+                    StringBuilder preconditionsBuilder = new StringBuilder();
+                    for (int i = 0; i < testCaseDTO.getPreconditions().size(); i++) {
+                        preconditionsBuilder.append(i + 1).append(". ")
+                                .append(testCaseDTO.getPreconditions().get(i).getStep());
+                        if (i < testCaseDTO.getPreconditions().size() - 1) {
+                            preconditionsBuilder.append("\n");
+                        }
                     }
+                    row.add(preconditionsBuilder.toString());
 
-                    currentRow++;
-
-                    for (int i = 0; i < entry.getValue().size(); i++) {
-                        TestCaseDTO testCaseDTO = entry.getValue().get(i);
-
-                        CellStyle cellStyle = workbook.createCellStyle();
-                        cellStyle.setWrapText(true);
-                        cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
-                        setBorderCellStyle(cellStyle, BorderStyle.THIN);
-
-                        Row testCaseRow = sheet.createRow(currentRow);
-
-                        Cell idCell = testCaseRow.createCell(0);
-                        Cell titleCell = testCaseRow.createCell(1);
-                        idCell.setCellStyle(cellStyle);
-                        titleCell.setCellStyle(cellStyle);
-                        idCell.setCellValue(testCaseDTO.getId());
-                        titleCell.setCellValue(testCaseDTO.getTitle());
-
-                        List<TestCaseDataDTO> testCaseData = testCaseDTO.getTestCaseData();
-                        List<PreconditionDTO> preconditions = testCaseDTO.getPreconditions();
-                        List<StepDTO> steps = testCaseDTO.getSteps();
-                        List<ExpectedResultDTO> er = testCaseDTO.getExpectedResult();
-
-                        StringBuilder multilineTestData = new StringBuilder();
-                        Cell testDataCell = testCaseRow.createCell(2);
-                        testDataCell.setCellStyle(cellStyle);
-
-                        for (int dataIndex = 0; dataIndex < testCaseData.size(); dataIndex++) {
-                            int step = dataIndex + 1;
-                            multilineTestData.append(step);
-                            multilineTestData.append(". ");
-                            multilineTestData.append(testCaseData.get(dataIndex).getStep());
-                            multilineTestData.append("\n");
+                    // Steps
+                    StringBuilder stepsBuilder = new StringBuilder();
+                    for (int i = 0; i < testCaseDTO.getSteps().size(); i++) {
+                        stepsBuilder.append(i + 1).append(". ")
+                                .append(testCaseDTO.getSteps().get(i).getStep());
+                        if (i < testCaseDTO.getSteps().size() - 1) {
+                            stepsBuilder.append("\n");
                         }
-
-                        StringBuilder multilineTestPreconditions = new StringBuilder();
-                        Cell testPrecondtionCell = testCaseRow.createCell(3);
-                        testPrecondtionCell.setCellStyle(cellStyle);
-
-                        for (int preconditionIndex = 0; preconditionIndex < preconditions.size(); preconditionIndex++) {
-                            int step = preconditionIndex + 1;
-                            multilineTestPreconditions.append(step);
-                            multilineTestPreconditions.append(". ");
-                            multilineTestPreconditions.append(preconditions.get(preconditionIndex).getStep());
-                            multilineTestPreconditions.append("\n");
-                        }
-
-                        StringBuilder multilineTestSteps = new StringBuilder();
-                        Cell testStepsCell = testCaseRow.createCell(4);
-                        testStepsCell.setCellStyle(cellStyle);
-
-                        for (int stepsIndex = 0; stepsIndex < steps.size(); stepsIndex++) {
-                            int step = stepsIndex + 1;
-                            multilineTestSteps.append(step);
-                            multilineTestSteps.append(". ");
-                            multilineTestSteps.append(steps.get(stepsIndex).getStep());
-                            multilineTestSteps.append("\n");
-                        }
-
-                        StringBuilder multilineTestEr = new StringBuilder();
-                        Cell testErCell = testCaseRow.createCell(5);
-                        testErCell.setCellStyle(cellStyle);
-
-                        for (int erIndex = 0; erIndex < er.size(); erIndex++) {
-                            int step = erIndex + 1;
-                            multilineTestEr.append(step);
-                            multilineTestEr.append(". ");
-                            multilineTestEr.append(er.get(erIndex).getStep());
-                            multilineTestEr.append("\n");
-                        }
-
-                        testDataCell.setCellValue(multilineTestData.toString());
-                        testPrecondtionCell.setCellValue(multilineTestPreconditions.toString());
-                        testStepsCell.setCellValue(multilineTestSteps.toString());
-                        testErCell.setCellValue(multilineTestEr.toString());
-
-                        currentRow++;
                     }
+                    row.add(stepsBuilder.toString());
 
-                    currentRow = currentRow + 1;
+                    // Expected result
+                    StringBuilder erBuilder = new StringBuilder();
+                    for (int i = 0; i < testCaseDTO.getExpectedResult().size(); i++) {
+                        erBuilder.append(i + 1).append(". ")
+                                .append(testCaseDTO.getExpectedResult().get(i).getStep());
+                        if (i < testCaseDTO.getExpectedResult().size() - 1) {
+                            erBuilder.append("\n");
+                        }
+                    }
+                    row.add(erBuilder.toString());
+
+                    data.add(row);
+                    rowStyles.add(contentCellStyle);
                 }
 
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                workbook.write(out);
-
-                return out.toByteArray();
+                // Добавляем пустую строку между сьютами
+                data.add(new ArrayList<>());
+                rowStyles.add(new WriteCellStyle());
             }
-        } catch(IOException e) {
-            e.printStackTrace();
 
+            ExcelWriter excelWriter = EasyExcel.write(out)
+                    .registerWriteHandler(new HorizontalCellStyleStrategy(null, rowStyles))
+                    .build();
+
+            WriteSheet sheet = EasyExcel.writerSheet("project").build();
+            excelWriter.write(data, sheet);
+            excelWriter.finish();
+
+            return out.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
 
     @Override
     public List<TestSuite> parseFromExcel(InputStream excelInputStream, Long projectId) {
-
         Project project = projectUtils.getProjectById(projectId);
-
         List<TestSuite> projectTestSuites = project.getTestsSuites();
         List<TestSuite> newTestSuites = new ArrayList<>(projectTestSuites);
 
         try {
-            try(XSSFWorkbook workbook = new XSSFWorkbook(excelInputStream)) {
-                XSSFSheet sheet = workbook.getSheetAt(0);
-                TestSuite currentTestSuite = null;
+            List<Map<Integer, String>> data = EasyExcel.read(excelInputStream)
+                    .sheet()
+                    .headRowNumber(0)
+                    .doReadSync();
 
-                for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            TestSuite currentTestSuite = null;
 
-                    if (sheet.getRow(i) == null) {
-                        continue;
-                    }
-
-                    Cell firstCell = sheet.getRow(i).getCell(0);
-
-                    if (
-                            firstCell == null
-                            || firstCell.toString().trim().isEmpty()
-                            || firstCell.getCellType() == CellType.BLANK
-                            || firstCell.getCellType() == CellType._NONE
-                    ) {
-                        continue;
-                    }
-
-                    if (
-                            firstCell.getCellType() == CellType.STRING
-                                    && firstCell.getStringCellValue().toLowerCase()
-                                    .contains("test-suite:")
-                    ) {
-                        currentTestSuite = new TestSuite();
-                        currentTestSuite.setTitle(sheet.getRow(i).getCell(1).getStringCellValue());
-                        currentTestSuite.setTag(Tag.NOT_ASSIGNED);
-                        currentTestSuite.setProject(project);
-                        currentTestSuite.setTestsCases(new ArrayList<>());
-                        newTestSuites.add(currentTestSuite);
-
-                        continue;
-                    }
-
-                    if (
-                            firstCell.getCellType() == CellType.STRING
-                            && firstCell.getStringCellValue().toUpperCase().contains("ID")
-                    ) {
-                        continue;
-                    }
-
-                    TestCase testCase = new TestCase();
-                    testCase.setTitle(sheet.getRow(i).getCell(1).getStringCellValue());
-                    String[] splitTestingData = splitCell(sheet.getRow(i).getCell(2));
-                    List<TestCaseData> testCaseData = Arrays.stream(splitTestingData)
-                            .map(data -> {
-                                TestCaseData tcData = new TestCaseData();
-                                tcData.setStep(data);
-
-                                return tcData;
-                            })
-                            .toList();
-                    testCase.setTestCaseData(testCaseData);
-                    String[] splitPrecondition = splitCell(sheet.getRow(i).getCell(3));
-                    List<TestCasePrecondition> preconditions = Arrays.stream(splitPrecondition)
-                            .map(precondition -> {
-                                TestCasePrecondition testPrecondition = new TestCasePrecondition();
-                                testPrecondition.setStep(precondition);
-
-                                return testPrecondition;
-                            })
-                            .toList();
-                    testCase.setTestCasePrecondition(preconditions);
-                    String[] splitSteps = splitCell(sheet.getRow(i).getCell(4));
-                    List<TestCaseStep> steps = Arrays.stream(splitSteps)
-                            .map(step -> {
-                                TestCaseStep testCaseStep = new TestCaseStep();
-                                testCaseStep.setStep(step);
-
-                                return testCaseStep;
-                            })
-                            .toList();
-                    testCase.setSteps(steps);
-                    String[] splitEr = splitCell(sheet.getRow(i).getCell(5));
-                    List<TestCaseExpectedResult> testCaseExpectedResults = Arrays.stream(splitEr)
-                            .map(er -> {
-                                TestCaseExpectedResult tcer = new TestCaseExpectedResult();
-                                tcer.setStep(er);
-
-                                return tcer;
-                            })
-                            .toList();
-                    testCase.setExpectedResult(testCaseExpectedResults);
-
-                    testCase.setTestSuite(currentTestSuite);
-                    if (currentTestSuite != null) {
-                        currentTestSuite.getTestsCases().add(testCase);
-                    }
-
+            for (int i = 0; i < data.size(); i++) {
+                Map<Integer, String> row = data.get(i);
+                if (row.isEmpty() || row.get(0) == null || row.get(0).trim().isEmpty()) {
+                    continue;
                 }
 
-            }
+                String firstCellValue = row.get(0);
 
-        } catch (IOException | NullPointerException e) {
+                if (firstCellValue != null && firstCellValue.toLowerCase().contains("test-suite:")) {
+                    currentTestSuite = new TestSuite();
+                    currentTestSuite.setTitle(row.get(1));
+                    currentTestSuite.setTag(Tag.NOT_ASSIGNED);
+                    currentTestSuite.setProject(project);
+                    currentTestSuite.setTestsCases(new ArrayList<>());
+                    newTestSuites.add(currentTestSuite);
+                    continue;
+                }
+
+                if (firstCellValue != null && firstCellValue.equalsIgnoreCase("ID")) {
+                    continue;
+                }
+
+                if (currentTestSuite != null && row.get(1) != null) {
+                    TestCase testCase = new TestCase();
+                    testCase.setTitle(row.get(1));
+
+                    // Testing data
+                    String[] testDataSteps = splitCell(row.get(2));
+                    List<TestCaseData> testCaseData = new ArrayList<>();
+                    for (String step : testDataSteps) {
+                        TestCaseData dataItem = new TestCaseData();
+                        dataItem.setStep(step);
+                        testCaseData.add(dataItem);
+                    }
+                    testCase.setTestCaseData(testCaseData);
+
+                    // Preconditions
+                    String[] preconditionSteps = splitCell(row.get(3));
+                    List<TestCasePrecondition> preconditions = new ArrayList<>();
+                    for (String step : preconditionSteps) {
+                        TestCasePrecondition precondition = new TestCasePrecondition();
+                        precondition.setStep(step);
+                        preconditions.add(precondition);
+                    }
+                    testCase.setTestCasePrecondition(preconditions);
+
+                    // Steps
+                    String[] stepSteps = splitCell(row.get(4));
+                    List<TestCaseStep> steps = new ArrayList<>();
+                    for (String step : stepSteps) {
+                        TestCaseStep caseStep = new TestCaseStep();
+                        caseStep.setStep(step);
+                        steps.add(caseStep);
+                    }
+                    testCase.setSteps(steps);
+
+                    // Expected result
+                    String[] erSteps = splitCell(row.get(5));
+                    List<TestCaseExpectedResult> expectedResults = new ArrayList<>();
+                    for (String step : erSteps) {
+                        TestCaseExpectedResult er = new TestCaseExpectedResult();
+                        er.setStep(step);
+                        expectedResults.add(er);
+                    }
+                    testCase.setExpectedResult(expectedResults);
+
+                    testCase.setTestSuite(currentTestSuite);
+                    currentTestSuite.getTestsCases().add(testCase);
+                }
+            }
+        } catch (Exception e) {
             throw new ExcelFileParsedException("Parsed exception");
         }
 
         return newTestSuites;
     }
 
-
-    private void setBorderCellStyle(CellStyle cellStyle, BorderStyle borderStyle) {
-        cellStyle.setBorderTop(borderStyle);
-        cellStyle.setBorderBottom(borderStyle);
-        cellStyle.setBorderLeft(borderStyle);
-        cellStyle.setBorderRight(borderStyle);
-    }
-
-    private String[] splitCell(Cell cell) {
-        String[] splitCell = cell.getStringCellValue().split("\n");
-
-        for (int stepIndex = 0; stepIndex < splitCell.length; stepIndex++) {
-            String step = splitCell[stepIndex];
-
-            if (step.contains(".")) {
-                splitCell[stepIndex] = step.substring(step.indexOf(".") + 1).trim();
-            }
+    private String[] splitCell(String cellValue) {
+        if (cellValue == null) {
+            return new String[0];
         }
 
+        String[] splitCell = cellValue.split("\n");
+        for (int i = 0; i < splitCell.length; i++) {
+            if (splitCell[i].contains(".")) {
+                splitCell[i] = splitCell[i].substring(splitCell[i].indexOf(".") + 1).trim();
+            }
+        }
         return splitCell;
     }
 
+    private void setBorderCellStyle(WriteCellStyle style, BorderStyle borderStyle) {
+        style.setBorderLeft(borderStyle);
+        style.setBorderRight(borderStyle);
+        style.setBorderTop(borderStyle);
+        style.setBorderBottom(borderStyle);
+    }
 }
