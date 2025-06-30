@@ -9,6 +9,7 @@ import com.tests.test_case_helper.enums.ErrorCode;
 import com.tests.test_case_helper.service.security.jwt.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -91,7 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.getWriter().write(objectMapper.writeValueAsString(userExceptionDTO));
 
                 return;
-            } catch (UsernameNotFoundException | SignatureException e) {
+            } catch (UsernameNotFoundException | SignatureException | MalformedJwtException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 UserExceptionDTO userExceptionDTO = new UserExceptionDTO(ErrorCode.INVALID_TOKEN.name(), e.getMessage());
