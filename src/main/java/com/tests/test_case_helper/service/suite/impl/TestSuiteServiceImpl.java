@@ -23,8 +23,10 @@ import com.tests.test_case_helper.service.suite.run.TestSuiteRunSessionUtil;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.user.UserUtils;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import com.tests.test_case_helper.service.utils.cache.EvictService;
 import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final TestSuiteMapper testSuiteMapper;
     private final TestSuiteUtil testSuiteUtil;
     private final TestCaseService testCaseService;
+    private final EvictService evictService;
     private final UserUtils userUtils;
     private final JwtServiceImpl jwtServiceImpl;
     private final TestSuiteRunSessionRepository testSuiteRunSessionRepository;
@@ -56,6 +59,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             TestSuiteMapper testSuiteMapper,
             TestSuiteUtil testSuiteUtil,
             TestCaseService testCaseService,
+            EvictService evictService
+            TestCaseService testCaseService,
             UserUtils userUtils,
             JwtServiceImpl jwtServiceImpl,
             TestSuiteRunSessionRepository testSuiteRunSessionRepository,
@@ -69,6 +74,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         this.testSuiteMapper = testSuiteMapper;
         this.testSuiteUtil = testSuiteUtil;
         this.testCaseService = testCaseService;
+        this.evictService = evictService;
         this.userUtils = userUtils;
         this.jwtServiceImpl = jwtServiceImpl;
         this.testSuiteRunSessionRepository = testSuiteRunSessionRepository;
@@ -79,6 +85,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
+    @CacheEvict(value = "project", key = "#createTestSuiteDTO.projectId")
     public CreateTestSuiteResponseDTO createTestSuite(CreateTestSuiteDTO createTestSuiteDTO) {
         Project project = projectUtils.getProjectById(createTestSuiteDTO.getProjectId());
 
@@ -102,6 +109,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     public TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO) {
         TestSuite foundTestSuite = testSuiteUtil.getTestSuiteById(id);
 
+        evictService.evictProjectCache(foundTestSuite.getProject().getId());
+
         foundTestSuite.setTitle(updateTestSuiteDTO.getTitle());
         foundTestSuite.setDescription(updateTestSuiteDTO.getDescription());
         foundTestSuite.setTag(Tag.valueOf(updateTestSuiteDTO.getTag().toUpperCase()));
@@ -114,6 +123,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
+
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id);
 
         return ExtendedTestSuiteDTO.builder()
@@ -128,6 +140,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
+
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id, pageable);
 
         return ExtendedTestSuiteDTO.builder()
@@ -143,6 +158,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Transactional
     public void deleteTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+
+        evictService.evictProjectCache(testSuite.getProject().getId());
 
         testSuiteRepository.delete(testSuite);
     }

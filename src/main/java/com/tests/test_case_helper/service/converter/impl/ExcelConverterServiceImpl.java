@@ -12,6 +12,7 @@ import com.tests.test_case_helper.service.converter.util.ExcelConverterServiceUt
 import com.tests.test_case_helper.service.project.utils.impl.ProjectUtil;
 import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import com.tests.test_case_helper.service.utils.cache.EvictService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
     private final ProjectMapper projectMapper;
     private final TestSuiteMapper testSuiteMapper;
     private final TestSuiteRepository testSuiteRepository;
+    private final EvictService evictService;
 
     public ExcelConverterServiceImpl(
             ProjectUtil projectUtil,
@@ -36,7 +38,8 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
             ExcelConverterServiceUtil excelConverterServiceUtil,
             ProjectMapper projectMapper,
             TestSuiteMapper testSuiteMapper,
-            TestSuiteRepository testSuiteRepository
+            TestSuiteRepository testSuiteRepository,
+            EvictService evictService
     ) {
         this.projectUtil = projectUtil;
         this.testCaseService = testCaseService;
@@ -44,6 +47,7 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
         this.projectMapper = projectMapper;
         this.testSuiteMapper = testSuiteMapper;
         this.testSuiteRepository = testSuiteRepository;
+        this.evictService = evictService;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
         List<TestSuite> testSuites = excelConverterServiceUtil.parseFromExcel(excelFileInputStream, projectId);
 
         Project project = projectUtil.getProjectById(projectId);
+
+        evictService.evictProjectCache(projectId);
 
         List<TestSuite> savedTestSuites = testSuiteRepository.saveAll(testSuites);
 
