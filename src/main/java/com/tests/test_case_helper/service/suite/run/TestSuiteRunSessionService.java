@@ -1,0 +1,96 @@
+package com.tests.test_case_helper.service.suite.run;
+
+import com.tests.test_case_helper.constants.ExceptionMessage;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
+import com.tests.test_case_helper.dto.suite.run.TestCaseRunResultDTO;
+import com.tests.test_case_helper.entity.TestCaseRunResult;
+import com.tests.test_case_helper.entity.TestSuiteRunSession;
+import com.tests.test_case_helper.entity.cases.TestCase;
+import com.tests.test_case_helper.enums.TestCaseStatus;
+import com.tests.test_case_helper.enums.TestSuiteRunStatus;
+import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundException;
+import com.tests.test_case_helper.repository.TestCaseRunResultsRepository;
+import com.tests.test_case_helper.repository.TestSuiteRepository;
+import com.tests.test_case_helper.repository.TestSuiteRunSessionRepository;
+import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import com.tests.test_case_helper.service.utils.TestSuiteRunResultMapper;
+import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
+import com.tests.test_case_helper.service.utils.UserMapper;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
+
+    private final TestSuiteRunSessionMapper testSuiteRunSessionMapper;
+    private final TestCaseRunResultsRepository testCaseRunResultsRepository;
+    private final TestSuiteRunResultMapper testSuiteRunResultMapper;
+    private final TestSuiteRunSessionRepository testSuiteRunSessionRepository;
+    private final TestSuiteRepository testSuiteRepository;
+    private final TestSuiteMapper testSuiteMapper;
+    private final UserMapper userMapper;
+
+    public TestSuiteRunSessionService(
+            TestSuiteRunSessionMapper testSuiteRunSessionMapper,
+            TestCaseRunResultsRepository testCaseRunResultsRepository,
+            TestSuiteRunResultMapper testSuiteRunResultMapper, TestSuiteRunSessionRepository testSuiteRunSessionRepository, TestSuiteRepository testSuiteRepository, TestSuiteMapper testSuiteMapper, UserMapper userMapper) {
+        this.testSuiteRunSessionMapper = testSuiteRunSessionMapper;
+        this.testCaseRunResultsRepository = testCaseRunResultsRepository;
+        this.testSuiteRunResultMapper = testSuiteRunResultMapper;
+        this.testSuiteRunSessionRepository = testSuiteRunSessionRepository;
+        this.testSuiteRepository = testSuiteRepository;
+        this.testSuiteMapper = testSuiteMapper;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public List<TestCaseRunResult> createRunResults(List<TestCase> testCases, TestSuiteRunSession runSession) {
+        return testCases.stream()
+                .map(tc -> createRunResult(tc, runSession))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RunTestSuiteResponseDTO mapSessionToDto(TestSuiteRunSession session) {
+        return testSuiteRunSessionMapper.toDto(session);
+    }
+
+    @Override
+    public RunTestSuiteResponseDTO getRunTestSuiteSessionById(Long id, Long sessionId, Pageable pageable) {
+        List<TestCaseRunResult> testCaseRunningResults = testCaseRunResultsRepository
+                .findAllTestCaseResultsByRunSessionId(id, sessionId, pageable);
+
+        List<TestCaseRunResultDTO> mappedResults = testCaseRunningResults.stream()
+                .map(testSuiteRunResultMapper::toDto)
+                .collect(Collectors.toList());
+
+        TestSuiteRunSessionRepository.TestSuiteRunSessionSlimProjection session = testSuiteRunSessionRepository
+                .getTestSuiteRunSessionSlimById(id, sessionId)
+                .orElseThrow(() -> new TestSuiteRunSessionNotFoundException(
+                            ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE
+                        )
+                );
+
+        return RunTestSuiteResponseDTO.builder()
+                .id(session.getId())
+                .testSuite(testSuiteMapper.toBaseTestSuiteDTO(session.getTestSuite()))
+                .executedBy(userMapper.toUserDTO(session.getExecutedBy()))
+                .environment(session.getEnvironment())
+                .testCaseRunResults(mappedResults)
+                .status(TestSuiteRunStatus.valueOf(session.getStatus()))
+                .build();
+    }
+
+    private TestCaseRunResult createRunResult(TestCase testCase, TestSuiteRunSession runSession) {
+        return TestCaseRunResult.builder()
+                .testSuiteRunSession(runSession)
+                .testCase(testCase)
+                .actualResult("")
+                .status(TestCaseStatus.NOT_TESTING)
+                .comment("")
+                .build();
+    }
+}

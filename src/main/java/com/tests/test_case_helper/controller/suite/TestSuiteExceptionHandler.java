@@ -1,16 +1,20 @@
 package com.tests.test_case_helper.controller.suite;
 
+import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
 import com.tests.test_case_helper.dto.exception.TestSuiteExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;
 import com.tests.test_case_helper.exceptions.TestSuiteNotFoundException;
+import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 
@@ -39,6 +43,48 @@ public class TestSuiteExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationExceptionDTO<TestSuiteExceptionDTO> onTestSuiteNotFoundException(TestSuiteNotFoundException ex) {
+        TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteEnvParamNotFoundException(
+            MissingServletRequestParameterException ex
+    ) {
+        TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteEnvParamIsInvalidException(
+            HandlerMethodValidationException ex
+    ) {
+        TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ExceptionMessage.ENVIRONMENT_NOT_FOUND_EXCEPTION_MESSAGE
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(TestSuiteRunSessionNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteSessionNotFoundException(
+            TestSuiteRunSessionNotFoundException ex
+    ) {
         TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()

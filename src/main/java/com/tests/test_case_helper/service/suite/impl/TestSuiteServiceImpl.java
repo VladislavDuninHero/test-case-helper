@@ -1,20 +1,36 @@
 package com.tests.test_case_helper.service.suite.impl;
 
+import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
+import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
-import com.tests.test_case_helper.entity.Project;
-import com.tests.test_case_helper.entity.TestSuite;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
+import com.tests.test_case_helper.entity.*;
+import com.tests.test_case_helper.entity.cases.TestCase;
+import com.tests.test_case_helper.enums.Environment;
 import com.tests.test_case_helper.enums.Tag;
+import com.tests.test_case_helper.enums.TestSuiteRunStatus;
+import com.tests.test_case_helper.repository.TestCaseRepository;
 import com.tests.test_case_helper.repository.TestSuiteRepository;
+import com.tests.test_case_helper.repository.TestSuiteRunSessionRepository;
 import com.tests.test_case_helper.service.cases.TestCaseService;
+import com.tests.test_case_helper.service.cases.utils.impl.TestCaseUtil;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
+import com.tests.test_case_helper.service.security.jwt.impl.JwtServiceImpl;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
+import com.tests.test_case_helper.service.suite.run.TestSuiteRunSessionService;
+import com.tests.test_case_helper.service.suite.run.TestSuiteRunSessionUtil;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
+import com.tests.test_case_helper.service.user.UserUtils;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
+import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,19 +42,40 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final TestSuiteMapper testSuiteMapper;
     private final TestSuiteUtil testSuiteUtil;
     private final TestCaseService testCaseService;
+    private final UserUtils userUtils;
+    private final JwtServiceImpl jwtServiceImpl;
+    private final TestSuiteRunSessionRepository testSuiteRunSessionRepository;
+    private final TestCaseUtil testCaseUtil;
+    private final TestCaseRepository testCaseRepository;
+    private final TestSuiteRunSessionUtil testSuiteRunSessionService;
+    private final TestSuiteRunSessionMapper testSuiteRunSessionMapper;
 
     public TestSuiteServiceImpl(
             TestSuiteRepository testSuiteRepository,
             ProjectUtils projectUtils,
             TestSuiteMapper testSuiteMapper,
             TestSuiteUtil testSuiteUtil,
-            TestCaseService testCaseService
+            TestCaseService testCaseService,
+            UserUtils userUtils,
+            JwtServiceImpl jwtServiceImpl,
+            TestSuiteRunSessionRepository testSuiteRunSessionRepository,
+            TestCaseUtil testCaseUtil,
+            TestCaseRepository testCaseRepository,
+            TestSuiteRunSessionUtil testSuiteRunSessionService,
+            TestSuiteRunSessionMapper testSuiteRunSessionMapper
     ) {
         this.testSuiteRepository = testSuiteRepository;
         this.projectUtils = projectUtils;
         this.testSuiteMapper = testSuiteMapper;
         this.testSuiteUtil = testSuiteUtil;
         this.testCaseService = testCaseService;
+        this.userUtils = userUtils;
+        this.jwtServiceImpl = jwtServiceImpl;
+        this.testSuiteRunSessionRepository = testSuiteRunSessionRepository;
+        this.testCaseUtil = testCaseUtil;
+        this.testCaseRepository = testCaseRepository;
+        this.testSuiteRunSessionService = testSuiteRunSessionService;
+        this.testSuiteRunSessionMapper = testSuiteRunSessionMapper;
     }
 
     @Override
@@ -111,8 +148,35 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
-    public ExtendedTestSuiteDTO runTestSuite(Long id) {
-        return null;
+    @Transactional
+    public ResponseMessageDTO runTestSuite(Long id, String env) {
+        TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+        User user = userUtils.findUserEntityByLoginAndReturn(
+                SecurityContextHolder.getContext().getAuthentication().getName()
+        );
+        List<TestCase> testCases = testCaseRepository.getAllTestCasesByTestSuiteIdWithoutPageable(id);
+
+        TestSuiteRunSession session = TestSuiteRunSession
+                .builder()
+                .testSuite(testSuite)
+                .startTime(LocalDateTime.now())
+                .environment(Environment.valueOf(env.toUpperCase()))
+                .executedBy(user)
+                .status(TestSuiteRunStatus.IN_PROGRESS)
+                .build();
+        testSuiteRunSessionRepository.save(session);
+
+        List<TestCaseRunResult> runResults = testSuiteRunSessionService.createRunResults(testCases, session);
+
+        session.setTestCaseRunResults(runResults);
+        testSuiteRunSessionRepository.save(session);
+
+        return new ResponseMessageDTO(ResponseMessage.SUCCESS_MESSAGE);
+    }
+
+    @Override
+    public RunTestSuiteResponseDTO getRunTestSuiteSessionById(Long id, Long sessionId, Pageable pageable) {
+        return testSuiteRunSessionService.getRunTestSuiteSessionById(id, sessionId, pageable);
     }
 
     @Override

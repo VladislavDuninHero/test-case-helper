@@ -4,7 +4,10 @@ import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
+import com.tests.test_case_helper.enums.Environment;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
+import com.tests.test_case_helper.service.validation.annotations.EnumValidate;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Pageable;
@@ -107,12 +110,33 @@ public class TestSuiteController {
     @PostMapping(Route.API_RUN_TEST_SUITE_ROUTE)
     @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
     @Validated
-    public ResponseEntity<ExtendedTestSuiteDTO> runTestSuite(
+    public ResponseEntity<ResponseMessageDTO> runTestSuite(
             @PathVariable
             @NotNull
-            Long id
+            Long id,
+            @RequestParam
+            @NotNull
+            @EnumValidate(enumClass = Environment.class, message = "")
+            String env
     ) {
-        ExtendedTestSuiteDTO runTestSuite = testSuiteService.runTestSuite(id);
+        ResponseMessageDTO runTestSuite = testSuiteService.runTestSuite(id, env);
+
+        return ResponseEntity.ok(runTestSuite);
+    }
+
+    @GetMapping(Route.API_RUN_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<RunTestSuiteResponseDTO> getRunTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            Long id,
+            @RequestParam
+            @NotNull
+            Long sessionId,
+            Pageable pageable
+    ) {
+        RunTestSuiteResponseDTO runTestSuite = testSuiteService.getRunTestSuiteSessionById(id, sessionId, pageable);
 
         return ResponseEntity.ok(runTestSuite);
     }
