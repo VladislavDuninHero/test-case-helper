@@ -18,7 +18,6 @@ import com.tests.test_case_helper.service.cases.utils.impl.TestCaseUtil;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
 import com.tests.test_case_helper.service.security.jwt.impl.JwtServiceImpl;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
-import com.tests.test_case_helper.service.suite.run.TestSuiteRunSessionService;
 import com.tests.test_case_helper.service.suite.run.TestSuiteRunSessionUtil;
 import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.user.UserUtils;
@@ -32,7 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,7 +41,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final ProjectUtils projectUtils;
     private final TestSuiteMapper testSuiteMapper;
     private final TestSuiteUtil testSuiteUtil;
-    private final TestCaseService testCaseService;
     private final EvictService evictService;
     private final UserUtils userUtils;
     private final JwtServiceImpl jwtServiceImpl;
@@ -52,6 +49,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final TestCaseRepository testCaseRepository;
     private final TestSuiteRunSessionUtil testSuiteRunSessionService;
     private final TestSuiteRunSessionMapper testSuiteRunSessionMapper;
+    private final TestCaseService testCaseService;
 
     public TestSuiteServiceImpl(
             TestSuiteRepository testSuiteRepository,
@@ -59,8 +57,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             TestSuiteMapper testSuiteMapper,
             TestSuiteUtil testSuiteUtil,
             TestCaseService testCaseService,
-            EvictService evictService
-            TestCaseService testCaseService,
+            EvictService evictService,
             UserUtils userUtils,
             JwtServiceImpl jwtServiceImpl,
             TestSuiteRunSessionRepository testSuiteRunSessionRepository,
@@ -73,7 +70,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         this.projectUtils = projectUtils;
         this.testSuiteMapper = testSuiteMapper;
         this.testSuiteUtil = testSuiteUtil;
-        this.testCaseService = testCaseService;
         this.evictService = evictService;
         this.userUtils = userUtils;
         this.jwtServiceImpl = jwtServiceImpl;
@@ -82,6 +78,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         this.testCaseRepository = testCaseRepository;
         this.testSuiteRunSessionService = testSuiteRunSessionService;
         this.testSuiteRunSessionMapper = testSuiteRunSessionMapper;
+        this.testCaseService = testCaseService;
     }
 
     @Override
