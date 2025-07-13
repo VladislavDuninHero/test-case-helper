@@ -1,15 +1,20 @@
 package com.tests.test_case_helper.service.suite.impl;
 
+import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionDTO;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionResponseDTO;
 import com.tests.test_case_helper.entity.*;
 import com.tests.test_case_helper.entity.cases.TestCase;
 import com.tests.test_case_helper.enums.Environment;
 import com.tests.test_case_helper.enums.Tag;
 import com.tests.test_case_helper.enums.TestSuiteRunStatus;
+import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
+import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundException;
 import com.tests.test_case_helper.repository.TestCaseRepository;
 import com.tests.test_case_helper.repository.TestSuiteRepository;
 import com.tests.test_case_helper.repository.TestSuiteRunSessionRepository;
@@ -32,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -155,6 +161,17 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Transactional
     public void deleteTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
+        User user = userUtils.findUserBySecurityContextAndReturn();
+
+        List<RunTestSuiteSessionDTO> activeSessions = getActiveRunTestSuiteSessionsByUserId(
+                user.getId(), testSuite.getId()
+        );
+        if (!activeSessions.isEmpty()) {
+            throw new ActiveTestingSessionIsExistsException(
+                    ExceptionMessage.ACTIVE_TEST_SUITE_RUN_SESSION_IS_EXISTS_EXCEPTION_MESSAGE,
+                    activeSessions
+            );
+        }
 
         evictService.evictProjectCache(testSuite.getProject().getId());
 
@@ -163,7 +180,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
     @Override
     @Transactional
-    public ResponseMessageDTO runTestSuite(Long id, String env) {
+    public RunTestSuiteSessionResponseDTO runTestSuite(Long id, String env) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
         User user = userUtils.findUserEntityByLoginAndReturn(
                 SecurityContextHolder.getContext().getAuthentication().getName()
@@ -185,7 +202,11 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         session.setTestCaseRunResults(runResults);
         testSuiteRunSessionRepository.save(session);
 
-        return new ResponseMessageDTO(ResponseMessage.SUCCESS_MESSAGE);
+        return RunTestSuiteSessionResponseDTO
+                .builder()
+                .runSessionId(session.getId())
+                .message(ResponseMessage.SUCCESS_MESSAGE)
+                .build();
     }
 
     @Override
@@ -202,7 +223,51 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                 .title(testSuite.getTitle())
                 .description(testSuite.getDescription())
                 .tag(testSuite.getTag().name())
+                .numberOfTestCases(testSuite.getTestsCases().size())
                 .build();
+    }
+
+    @Override
+    public List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessions() {
+        User user = userUtils.findUserEntityByLoginAndReturn(
+                SecurityContextHolder.getContext().getAuthentication().getName()
+        );
+
+        List<TestSuiteRunSessionRepository.TestSuiteRunSessionSlimProjection> testSuiteActiveRunsProjection = testSuiteRunSessionRepository
+                .getTestSuiteRunSessionsSlimByUserId(user.getId());
+
+        return testSuiteActiveRunsProjection
+                .stream()
+                .map(activeTestSuite -> new RunTestSuiteSessionDTO(
+                        activeTestSuite.getId(),
+                        activeTestSuite.getTestSuite().getId(),
+                        activeTestSuite.getTestSuite().getTitle(),
+                        activeTestSuite.getEnvironment()
+                ))
+                .toList();
+    }
+
+    @Override
+    public ResponseMessageDTO deleteRunTestSuiteSessionById(Long id, Long sessionId) {
+        TestSuiteRunSession session = testSuiteRunSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new TestSuiteRunSessionNotFoundException(
+                        ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE)
+                );
+
+        testSuiteRunSessionRepository.delete(session);
+
+        return new ResponseMessageDTO(ResponseMessage.SUCCESS_MESSAGE);
+    }
+
+    public List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessionsByUserId(Long userId, Long testSuiteId) {
+        User user = userUtils.findRegisteredUserByIdAndReturn(userId);
+        TestSuite testSuite = testSuiteUtil.getTestSuiteById(testSuiteId);
+
+        List<RunTestSuiteSessionDTO> activeSessions = getActiveRunTestSuiteSessions();
+
+        return activeSessions.stream()
+                .filter(active -> active.getTestSuiteId().equals(testSuiteId))
+                .collect(Collectors.toList());
     }
 
 }

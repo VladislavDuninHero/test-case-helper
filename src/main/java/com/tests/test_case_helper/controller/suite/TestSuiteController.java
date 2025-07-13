@@ -5,6 +5,8 @@ import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionDTO;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionResponseDTO;
 import com.tests.test_case_helper.enums.Environment;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.validation.annotations.EnumValidate;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(Route.API_TEST_SUITE_ROUTE)
@@ -110,7 +113,7 @@ public class TestSuiteController {
     @PostMapping(Route.API_RUN_TEST_SUITE_ROUTE)
     @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
     @Validated
-    public ResponseEntity<ResponseMessageDTO> runTestSuite(
+    public ResponseEntity<RunTestSuiteSessionResponseDTO> runTestSuite(
             @PathVariable
             @NotNull
             Long id,
@@ -119,7 +122,7 @@ public class TestSuiteController {
             @EnumValidate(enumClass = Environment.class, message = "")
             String env
     ) {
-        ResponseMessageDTO runTestSuite = testSuiteService.runTestSuite(id, env);
+        RunTestSuiteSessionResponseDTO runTestSuite = testSuiteService.runTestSuite(id, env);
 
         return ResponseEntity.ok(runTestSuite);
     }
@@ -137,6 +140,31 @@ public class TestSuiteController {
             Pageable pageable
     ) {
         RunTestSuiteResponseDTO runTestSuite = testSuiteService.getRunTestSuiteSessionById(id, sessionId, pageable);
+
+        return ResponseEntity.ok(runTestSuite);
+    }
+
+    @GetMapping(Route.API_GET_ACTIVE_TEST_SUITE_RUN_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<List<RunTestSuiteSessionDTO>> getRunTestSuiteSessionById() {
+        List<RunTestSuiteSessionDTO> activeRunTestSuiteSessions = testSuiteService.getActiveRunTestSuiteSessions();
+
+        return ResponseEntity.ok(activeRunTestSuiteSessions);
+    }
+
+    @DeleteMapping(Route.API_DELETE_RUN_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<ResponseMessageDTO> deleteRunTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            Long id,
+            @PathVariable
+            @NotNull
+            Long sessionId
+    ) {
+        ResponseMessageDTO runTestSuite = testSuiteService.deleteRunTestSuiteSessionById(id, sessionId);
 
         return ResponseEntity.ok(runTestSuite);
     }

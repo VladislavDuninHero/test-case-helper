@@ -42,7 +42,7 @@ public class TestSuiteRunSession {
     @Enumerated(EnumType.STRING)
     private Environment environment;
 
-    @OneToMany(mappedBy = "testSuiteRunSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "testSuiteRunSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TestCaseRunResult> testCaseRunResults;
 
     @Column(name = "status")

@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface TestSuiteRunSessionRepository extends JpaRepository<TestSuiteRunSession, Long> {
+
     @Query("FROM TestSuiteRunSession tsrs WHERE tsrs.id = :runSessionId")
     Optional<TestSuiteRunSession> getTestSuiteRunSessionById(Long runSessionId);
 
@@ -27,6 +29,19 @@ public interface TestSuiteRunSessionRepository extends JpaRepository<TestSuiteRu
     """)
     Optional<TestSuiteRunSessionSlimProjection> getTestSuiteRunSessionSlimById(Long testSuiteId, Long runSessionId);
 
+    @Query("""
+    SELECT
+        tsrs.id as id,
+        tsrs.testSuite as testSuite,
+        tsrs.startTime as startTime,
+        tsrs.endTime as endTime,
+        tsrs.executedBy as executedBy,
+        tsrs.environment as environment,
+        tsrs.status as status
+    FROM TestSuiteRunSession tsrs
+    WHERE tsrs.executedBy.id = :userId AND tsrs.status = 'IN_PROGRESS'
+    """)
+    List<TestSuiteRunSessionSlimProjection> getTestSuiteRunSessionsSlimByUserId(Long userId);
 
     interface TestSuiteRunSessionSlimProjection {
         Long getId();
