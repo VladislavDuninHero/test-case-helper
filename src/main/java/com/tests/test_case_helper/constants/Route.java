@@ -22,4 +22,6 @@ public final class Route {
     public static final String API_EXCEL_CONVERTER_ROUTE = "/excel";
     public static final String API_RUN_TEST_SUITE_ROUTE = "/{id}/run";
     public static final String API_DELETE_RUN_TEST_SUITE_ROUTE = "/{id}/run/{sessionId}/delete";
+    public static final String API_UPDATE_RUN_TEST_SUITE_TC_RESULT_ROUTE = "/run/update";
+    public static final String API_GET_RUN_TEST_SUITE_TC_RESULT_ROUTE = "/run/result/{id}";
 }

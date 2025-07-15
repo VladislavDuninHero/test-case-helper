@@ -17,4 +17,7 @@ public final class ExceptionMessage {
     public static final String ENVIRONMENT_NOT_FOUND_EXCEPTION_MESSAGE = "Environment not found";
     public static final String TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE = "Test-suite run session not found";
     public static final String ACTIVE_TEST_SUITE_RUN_SESSION_IS_EXISTS_EXCEPTION_MESSAGE = "Test-suite run sessions is exists";
+    public static final String TEST_CASE_STATUS_NOT_FOUND_EXCEPTION_MESSAGE = "Test-case status not found";
+    public static final String TEST_CASE_RESULT_NOT_FOUND_EXCEPTION_MESSAGE = "Test-case result not found";
+    public static final String TEST_CASE_RESULT_MISSING_REQUIRED_FIELD_EXCEPTION_MESSAGE = "Missing required field";
 }

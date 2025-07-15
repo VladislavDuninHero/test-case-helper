@@ -15,4 +15,5 @@ public interface TestSuiteRunSessionUtil {
     RunTestSuiteResponseDTO mapSessionToDto(TestSuiteRunSession session);
     RunTestSuiteResponseDTO getRunTestSuiteSessionById(Long id, Long sessionId, Pageable pageable);
     void validateTestSuiteRunSession(User user, TestSuiteRunSessionRepository.TestSuiteRunSessionSlimProjection runSession);
+    void findTestSuiteRunSessionById(Long id, Long sessionId);
 }

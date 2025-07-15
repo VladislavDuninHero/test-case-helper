@@ -12,7 +12,13 @@ import java.util.Optional;
 
 public interface TestSuiteRunSessionRepository extends JpaRepository<TestSuiteRunSession, Long> {
 
-    @Query("FROM TestSuiteRunSession tsrs WHERE tsrs.id = :runSessionId")
+    @Query("""
+            FROM TestSuiteRunSession tsrs 
+            JOIN FETCH tsrs.testCaseRunResults
+            JOIN FETCH tsrs.testSuite
+            JOIN FETCH tsrs.executedBy
+            WHERE tsrs.id = :runSessionId
+    """)
     Optional<TestSuiteRunSession> getTestSuiteRunSessionById(Long runSessionId);
 
     @Query("""
@@ -25,6 +31,7 @@ public interface TestSuiteRunSessionRepository extends JpaRepository<TestSuiteRu
         tsrs.environment as environment,
         tsrs.status as status
     FROM TestSuiteRunSession tsrs
+    JOIN tsrs.testSuite ts
     WHERE tsrs.id = :runSessionId AND tsrs.testSuite.id = :testSuiteId
     """)
     Optional<TestSuiteRunSessionSlimProjection> getTestSuiteRunSessionSlimById(Long testSuiteId, Long runSessionId);

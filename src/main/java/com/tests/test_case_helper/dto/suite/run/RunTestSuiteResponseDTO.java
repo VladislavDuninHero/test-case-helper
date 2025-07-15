@@ -18,5 +18,6 @@ public class RunTestSuiteResponseDTO {
     private UserDTO executedBy;
     private String environment;
     private List<TestCaseRunResultDTO> testCaseRunResults;
+    private List<TestSuiteRunSessionStatisticDTO> sessionStatistic;
     private TestSuiteRunStatus status;
 }

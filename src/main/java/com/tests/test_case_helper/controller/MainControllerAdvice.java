@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @ControllerAdvice
@@ -19,6 +20,18 @@ public class MainControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ValidationExceptionDTO<UserExceptionDTO> onTestSuiteNotFoundException(AccessDeniedException ex) {
+        UserExceptionDTO userErrorDTO = new UserExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(userErrorDTO));
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ValidationExceptionDTO<UserExceptionDTO> onTestSuiteNotFoundException(SQLIntegrityConstraintViolationException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()

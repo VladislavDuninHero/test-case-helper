@@ -2,9 +2,7 @@ package com.tests.test_case_helper.service.suite;
 
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
-import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
-import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionDTO;
-import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionResponseDTO;
+import com.tests.test_case_helper.dto.suite.run.*;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -20,4 +18,8 @@ public interface TestSuiteService {
     TestSuiteDTO getSlimTestSuite(Long id);
     List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessions();
     ResponseMessageDTO deleteRunTestSuiteSessionById(Long id, Long sessionId);
+    UpdateTestCaseResultResponseDTO updateTestCaseResultInTestSuiteSessionById(UpdateTestCaseResultDTO updateTestCaseResultDTO);
+    TestCaseRunResultDTO getTestCaseResultInTestSuiteById(Long id);
+    List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessionsByUserId(Long userId, Long testSuiteId);
+    List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessionsByUser();
 }
