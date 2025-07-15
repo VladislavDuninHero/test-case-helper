@@ -16,6 +16,9 @@ public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
     @Query("FROM TestCase tc WHERE tc.testSuite.id = :testSuiteId")
     List<TestCase> getAllTestCasesByTestSuiteId(Long testSuiteId);
 
+    @Query("FROM TestCase tc WHERE tc.testSuite.id = :testSuiteId")
+    List<TestCase> getAllTestCasesByTestSuiteIdWithoutPageable(Long testSuiteId);
+
     @Query("FROM TestCase tc WHERE tc.id = :id")
     Optional<TestCase> getTestCaseById(Long id);
 }

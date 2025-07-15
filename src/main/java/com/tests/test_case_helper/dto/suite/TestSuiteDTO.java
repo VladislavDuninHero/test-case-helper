@@ -12,4 +12,5 @@ public class TestSuiteDTO {
     private String title;
     private String description;
     private String tag;
+    private Integer numberOfTestCases;
 }

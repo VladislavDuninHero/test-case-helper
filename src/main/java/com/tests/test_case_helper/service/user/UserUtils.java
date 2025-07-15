@@ -11,4 +11,5 @@ public interface UserUtils {
     User findRegisteredUserByIdAndReturn(Long userId);
     void validateAdminToken(String token);
     void validateUserPassword(String password, String foundUserPassword);
+    User findUserBySecurityContextAndReturn();
 }

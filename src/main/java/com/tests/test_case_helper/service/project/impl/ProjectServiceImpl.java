@@ -1,10 +1,16 @@
 package com.tests.test_case_helper.service.project.impl;
 
+import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.project.*;
+import com.tests.test_case_helper.dto.suite.run.RunTestSuiteSessionDTO;
 import com.tests.test_case_helper.entity.Project;
+import com.tests.test_case_helper.entity.TestSuite;
+import com.tests.test_case_helper.entity.User;
+import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
 import com.tests.test_case_helper.repository.ProjectRepository;
 import com.tests.test_case_helper.service.project.ProjectService;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
+import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.validation.manager.impl.ProjectValidationManager;
@@ -26,19 +32,22 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
     private final ProjectUtils projectUtils;
     private final TestSuiteMapper testSuiteMapper;
+    private final TestSuiteService testSuiteService;
 
     public ProjectServiceImpl(
             ProjectRepository projectRepository,
             ProjectValidationManager projectValidationManager,
             ProjectMapper projectMapper,
             ProjectUtils projectUtils,
-            TestSuiteMapper testSuiteMapper
+            TestSuiteMapper testSuiteMapper,
+            TestSuiteService testSuiteService
     ) {
         this.projectRepository = projectRepository;
         this.projectValidationManager = projectValidationManager;
         this.projectMapper = projectMapper;
         this.projectUtils = projectUtils;
         this.testSuiteMapper = testSuiteMapper;
+        this.testSuiteService = testSuiteService;
     }
 
     @Override
@@ -108,6 +117,14 @@ public class ProjectServiceImpl implements ProjectService {
     })
     public void deleteProject(Long projectId) {
         Project project = projectUtils.getProjectById(projectId);
+
+        List<RunTestSuiteSessionDTO> activeSessions = testSuiteService.getActiveRunTestSuiteSessionsByUser();
+        if (!activeSessions.isEmpty()) {
+            throw new ActiveTestingSessionIsExistsException(
+                    ExceptionMessage.ACTIVE_TEST_SUITE_RUN_SESSION_IS_EXISTS_EXCEPTION_MESSAGE,
+                    activeSessions
+            );
+        }
 
         projectRepository.delete(project);
     }
