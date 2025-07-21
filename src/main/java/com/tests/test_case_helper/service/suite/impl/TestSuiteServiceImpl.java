@@ -6,6 +6,9 @@ import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.dto.suite.run.*;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultSlimDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestSuiteRunSessionResultsDTO;
 import com.tests.test_case_helper.entity.*;
 import com.tests.test_case_helper.entity.cases.TestCase;
 import com.tests.test_case_helper.enums.Environment;
@@ -13,12 +16,15 @@ import com.tests.test_case_helper.enums.Tag;
 import com.tests.test_case_helper.enums.TestCaseStatus;
 import com.tests.test_case_helper.enums.TestSuiteRunStatus;
 import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
-import com.tests.test_case_helper.exceptions.TestCaseResultNotFoundException;
+import com.tests.test_case_helper.exceptions.TestSuiteRunSessionAlreadyEndedException;
+import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotEndedException;
 import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundException;
 import com.tests.test_case_helper.repository.TestCaseRepository;
 import com.tests.test_case_helper.repository.TestCaseRunResultsRepository;
 import com.tests.test_case_helper.repository.TestSuiteRepository;
 import com.tests.test_case_helper.repository.TestSuiteRunSessionRepository;
+import com.tests.test_case_helper.repository.projections.TestCaseRunResultSlimProjection;
+import com.tests.test_case_helper.repository.projections.TestSuiteRunSessionProjection;
 import com.tests.test_case_helper.service.cases.TestCaseService;
 import com.tests.test_case_helper.service.cases.utils.impl.TestCaseUtil;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
@@ -31,8 +37,10 @@ import com.tests.test_case_helper.service.suite.utils.impl.TestSuiteUtil;
 import com.tests.test_case_helper.service.user.UserUtils;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteRunResultMapper;
+import com.tests.test_case_helper.service.utils.UserMapper;
 import com.tests.test_case_helper.service.utils.cache.EvictService;
 import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
+import com.tests.test_case_helper.service.validation.manager.impl.TestSuiteRunSessionValidationManager;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +48,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,6 +72,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     private final TestSuiteRunResultMapper testSuiteRunResultMapper;
     private final TestCaseResultUtils testCaseResultService;
     private final TestCaseRunResultService testCaseRunResultService;
+    private final TestSuiteRunSessionUtil testSuiteRunSessionUtil;
+    private final UserMapper userMapper;
+    private final TestSuiteRunSessionValidationManager testSuiteRunSessionValidationManager;
 
     public TestSuiteServiceImpl(
             TestSuiteRepository testSuiteRepository,
@@ -83,7 +93,11 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             TestCaseRunResultsRepository testCaseRunResultsRepository,
             TestSuiteRunResultMapper testSuiteRunResultMapper,
             TestCaseResultUtils testCaseResultService,
-            TestCaseRunResultService testCaseRunResultService) {
+            TestCaseRunResultService testCaseRunResultService,
+            TestSuiteRunSessionUtil testSuiteRunSessionUtil,
+            UserMapper userMapper,
+            TestSuiteRunSessionValidationManager testSuiteRunSessionValidationManager
+    ) {
         this.testSuiteRepository = testSuiteRepository;
         this.projectUtils = projectUtils;
         this.testSuiteMapper = testSuiteMapper;
@@ -101,6 +115,9 @@ public class TestSuiteServiceImpl implements TestSuiteService {
         this.testSuiteRunResultMapper = testSuiteRunResultMapper;
         this.testCaseResultService = testCaseResultService;
         this.testCaseRunResultService = testCaseRunResultService;
+        this.testSuiteRunSessionUtil = testSuiteRunSessionUtil;
+        this.userMapper = userMapper;
+        this.testSuiteRunSessionValidationManager = testSuiteRunSessionValidationManager;
     }
 
     @Override
@@ -259,7 +276,26 @@ public class TestSuiteServiceImpl implements TestSuiteService {
                         activeTestSuite.getId(),
                         activeTestSuite.getTestSuite().getId(),
                         activeTestSuite.getTestSuite().getTitle(),
-                        activeTestSuite.getEnvironment()
+                        activeTestSuite.getEnvironment(),
+                        activeTestSuite.getStartTime()
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessionsByScheduled() {
+        List<TestSuiteRunSessionRepository
+                .TestSuiteRunSessionSlimProjection> testSuiteActiveRunsProjection = testSuiteRunSessionRepository
+                .getActiveTestSuiteRunSessions();
+
+        return testSuiteActiveRunsProjection
+                .stream()
+                .map(activeTestSuite -> new RunTestSuiteSessionDTO(
+                        activeTestSuite.getId(),
+                        activeTestSuite.getTestSuite().getId(),
+                        activeTestSuite.getTestSuite().getTitle(),
+                        activeTestSuite.getEnvironment(),
+                        activeTestSuite.getStartTime()
                 ))
                 .toList();
     }
@@ -322,6 +358,76 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public List<RunTestSuiteSessionDTO> getActiveRunTestSuiteSessionsByUser() {
         return getActiveRunTestSuiteSessions();
+    }
+
+    @Override
+    @Transactional
+    public ResponseMessageDTO endTestSuiteRunSessionById(Long id, TestSuiteRunStatus status) {
+        TestSuiteRunSessionProjection session = testSuiteRunSessionService.findTestSuiteRunSessionByIdAndReturn(id);
+
+        if (
+                session.getStatus().equals(TestSuiteRunStatus.ENDED.name())
+                || session.getStatus().equals(TestSuiteRunStatus.ENDED_BY_TIMEOUT.name())
+        ) {
+            throw new TestSuiteRunSessionAlreadyEndedException(ExceptionMessage.TEST_SUITE_RUN_SESSION_ALREADY_ENDED_EXCEPTION_MESSAGE);
+        }
+
+        testSuiteRunSessionRepository.endTestSuiteRunSessionById(
+                id,
+                LocalDateTime.now(),
+                status
+        );
+
+        return new ResponseMessageDTO(ResponseMessage.SUCCESS_MESSAGE);
+    }
+
+    public EndTestSuiteRunSessionDTO getEndedTestSuiteRunSessionById(Long id, TestSuiteRunStatus status) {
+        TestSuiteRunSessionProjection session = testSuiteRunSessionService.findTestSuiteRunSessionByIdAndReturn(id);
+
+        if (
+                !session.getStatus().equals(TestSuiteRunStatus.ENDED.name())
+                        && !session.getStatus().equals(TestSuiteRunStatus.ENDED_BY_TIMEOUT.name())
+        ) {
+            throw new TestSuiteRunSessionNotEndedException(
+                    ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_ENDED_EXCEPTION_MESSAGE
+            );
+        }
+
+        Long totalTime = testSuiteRunSessionService.calculateRunTestSuiteSessionExecutionTime(session);
+        List<TestSuiteRunSessionStatisticDTO> statistic = testCaseResultService.getStatusStatisticsBySessionId(id);
+
+        return EndTestSuiteRunSessionDTO.builder()
+                .id(session.getId())
+                .testSuiteTitle(session.getTestSuiteTitle())
+                .environment(session.getEnvironment())
+                .executedBy(userMapper.toUserDTO(session.getExecutedBy()))
+                .executionTime(totalTime)
+                .sessionStatistic(statistic)
+                .build();
+    }
+
+    @Override
+    public TestSuiteRunSessionResultsDTO getEndedTestSuiteRunSessionResultsById(Long id, Pageable pageable) {
+        TestSuiteRunSessionProjection session = testSuiteRunSessionService.findTestSuiteRunSessionByIdAndReturn(id);
+
+        testSuiteRunSessionService.validateUserInTestSuiteRunSession(session);
+
+        List<TestCaseRunResultSlimProjection> results = testCaseRunResultsRepository
+                .findAllTestCaseRunResultsSlimById(id, pageable);
+
+        Integer allResultsSize = testCaseRunResultsRepository.countAllResultsForSession(id);
+
+        List<TestCaseRunResultSlimDTO> mappedResults = results.stream()
+                .map(result -> new TestCaseRunResultSlimDTO(
+                            result.getId(), result.getTestCaseTitle(), result.getStatus()
+                        )
+                )
+                .toList();
+
+        return new TestSuiteRunSessionResultsDTO(
+                allResultsSize,
+                mappedResults
+        );
     }
 
 }

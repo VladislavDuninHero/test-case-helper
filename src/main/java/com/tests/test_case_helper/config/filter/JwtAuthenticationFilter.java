@@ -95,7 +95,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (UsernameNotFoundException | SignatureException | MalformedJwtException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-                UserExceptionDTO userExceptionDTO = new UserExceptionDTO(ErrorCode.INVALID_TOKEN.name(), e.getMessage());
+                UserExceptionDTO userExceptionDTO = new UserExceptionDTO(
+                        ErrorCode.INVALID_TOKEN.name(),
+                        ExceptionMessage.USER_OR_TOKEN_IS_INVALID_EXCEPTION_MESSAGE
+                );
                 response.getWriter().write(objectMapper.writeValueAsString(userExceptionDTO));
 
                 return;

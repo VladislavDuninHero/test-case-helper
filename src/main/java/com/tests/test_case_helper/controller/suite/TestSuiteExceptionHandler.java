@@ -1,15 +1,9 @@
 package com.tests.test_case_helper.controller.suite;
 
 import com.tests.test_case_helper.constants.ExceptionMessage;
-import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
-import com.tests.test_case_helper.dto.exception.TestSuiteExceptionDTO;
-import com.tests.test_case_helper.dto.exception.TestSuiteRunSessionExceptionDTO;
-import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
+import com.tests.test_case_helper.dto.exception.*;
 import com.tests.test_case_helper.enums.ErrorCode;
-import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
-import com.tests.test_case_helper.exceptions.TestCaseResultNotFoundException;
-import com.tests.test_case_helper.exceptions.TestSuiteNotFoundException;
-import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundException;
+import com.tests.test_case_helper.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -115,7 +109,7 @@ public class TestSuiteExceptionHandler {
     @ExceptionHandler(TestCaseResultNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteSessionNotFoundException(
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteSessionRunResultNotFoundException(
             TestCaseResultNotFoundException ex
     ) {
         TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
@@ -133,6 +127,34 @@ public class TestSuiteExceptionHandler {
             HttpMessageNotReadableException ex
     ) {
         TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(TestSuiteRunSessionAlreadyEndedException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteExceptionDTO> onRunTestSuiteSessionIsEndedException(
+            TestSuiteRunSessionAlreadyEndedException ex
+    ) {
+        TestSuiteExceptionDTO testSuiteErrorDTO = new TestSuiteExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ValidationExceptionDTO<ProjectExceptionDTO> onProjectNotFoundException(
+            ProjectNotFoundException ex
+    ) {
+        ProjectExceptionDTO testSuiteErrorDTO = new ProjectExceptionDTO(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ex.getLocalizedMessage()
         );

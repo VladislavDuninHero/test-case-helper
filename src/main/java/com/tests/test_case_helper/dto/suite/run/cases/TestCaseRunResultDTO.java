@@ -1,4 +1,4 @@
-package com.tests.test_case_helper.dto.suite.run;
+package com.tests.test_case_helper.dto.suite.run.cases;
 
 import com.tests.test_case_helper.dto.cases.TestCaseDTO;
 import com.tests.test_case_helper.enums.TestCaseStatus;

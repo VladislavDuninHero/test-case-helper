@@ -2,6 +2,8 @@ package com.tests.test_case_helper.dto.suite.run;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,4 +14,5 @@ public class RunTestSuiteSessionDTO {
     private Long testSuiteId;
     private String testSuiteTitle;
     private String environment;
+    private LocalDateTime startTime;
 }

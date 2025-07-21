@@ -2,7 +2,7 @@ package com.tests.test_case_helper.service.suite.run;
 
 import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.suite.run.RunTestSuiteResponseDTO;
-import com.tests.test_case_helper.dto.suite.run.TestCaseRunResultDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultDTO;
 import com.tests.test_case_helper.dto.suite.run.TestSuiteRunSessionStatisticDTO;
 import com.tests.test_case_helper.entity.TestCaseRunResult;
 import com.tests.test_case_helper.entity.TestSuiteRunSession;
@@ -14,6 +14,7 @@ import com.tests.test_case_helper.exceptions.TestSuiteRunSessionNotFoundExceptio
 import com.tests.test_case_helper.repository.TestCaseRunResultsRepository;
 import com.tests.test_case_helper.repository.TestSuiteRepository;
 import com.tests.test_case_helper.repository.TestSuiteRunSessionRepository;
+import com.tests.test_case_helper.repository.projections.TestSuiteRunSessionProjection;
 import com.tests.test_case_helper.service.suite.run.result.TestCaseResultUtils;
 import com.tests.test_case_helper.service.suite.run.result.TestCaseRunResultService;
 import com.tests.test_case_helper.service.user.UserUtils;
@@ -21,10 +22,12 @@ import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteRunResultMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
 import com.tests.test_case_helper.service.utils.UserMapper;
+import com.tests.test_case_helper.service.validation.manager.impl.TestSuiteRunSessionValidationManager;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +44,7 @@ public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
     private final UserUtils userUtils;
     private final TestCaseResultUtils testCaseResultService;
     private final TestCaseRunResultService testCaseRunResultService;
+    private final TestSuiteRunSessionValidationManager testSuiteRunSessionValidationManager;
 
     public TestSuiteRunSessionService(
             TestSuiteRunSessionMapper testSuiteRunSessionMapper,
@@ -52,7 +56,9 @@ public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
             UserMapper userMapper,
             UserUtils userUtils,
             TestCaseResultUtils testCaseResultService,
-            TestCaseRunResultService testCaseRunResultService) {
+            TestCaseRunResultService testCaseRunResultService,
+            TestSuiteRunSessionValidationManager testSuiteRunSessionValidationManager
+    ) {
         this.testSuiteRunSessionMapper = testSuiteRunSessionMapper;
         this.testCaseRunResultsRepository = testCaseRunResultsRepository;
         this.testSuiteRunResultMapper = testSuiteRunResultMapper;
@@ -63,6 +69,7 @@ public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
         this.userUtils = userUtils;
         this.testCaseResultService = testCaseResultService;
         this.testCaseRunResultService = testCaseRunResultService;
+        this.testSuiteRunSessionValidationManager = testSuiteRunSessionValidationManager;
     }
 
     @Override
@@ -94,11 +101,7 @@ public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
                         )
                 );
 
-        User user = userUtils.findUserEntityByLoginAndReturn(
-                SecurityContextHolder.getContext().getAuthentication().getName()
-        );
-
-        validateTestSuiteRunSession(user, session);
+        testSuiteRunSessionValidationManager.validate(session);
 
         List<TestSuiteRunSessionStatisticDTO> sessionStatistic = testCaseRunResultService
                 .getStatusStatisticsBySessionId(sessionId);
@@ -115,24 +118,56 @@ public class TestSuiteRunSessionService implements TestSuiteRunSessionUtil {
     }
 
     @Override
-    public void validateTestSuiteRunSession(
-            User user,
-            TestSuiteRunSessionRepository.TestSuiteRunSessionSlimProjection runSession
-    ) {
-        if (!runSession.getExecutedBy().equals(user)) {
-            throw new TestSuiteRunSessionNotFoundException(
-                    ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE
-            );
-        }
-    }
-
-    @Override
     public void findTestSuiteRunSessionById(Long id, Long sessionId) {
         testSuiteRunSessionRepository.getTestSuiteRunSessionSlimById(id, sessionId)
                 .orElseThrow(() -> new TestSuiteRunSessionNotFoundException(
                         ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE
                     )
                 );
+    }
+
+    @Override
+    public TestSuiteRunSessionProjection findTestSuiteRunSessionByIdAndReturn(Long id) {
+        return testSuiteRunSessionRepository.getTestSuiteRunSessionSlimById(id)
+                .orElseThrow(() -> new TestSuiteRunSessionNotFoundException(
+                                ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE
+                        )
+                );
+    }
+
+    @Override
+    public Long calculateRunTestSuiteSessionExecutionTime(TestSuiteRunSessionProjection runSession) {
+        LocalDateTime currentTime = runSession.getEndTime() != null ? runSession.getEndTime() : LocalDateTime.now();
+        LocalDateTime startSessionTime = runSession.getStartTime();
+
+        Duration duration = Duration.between(startSessionTime, currentTime);
+
+        return duration.getSeconds();
+    }
+
+    @Override
+    public String calculateRunTestSuiteSessionExecutionTimeForWord(TestSuiteRunSessionProjection runSession) {
+        LocalDateTime startSessionTime = runSession.getStartTime();
+        LocalDateTime endTime = runSession.getEndTime();
+
+        Duration duration = Duration.between(startSessionTime, endTime);
+
+        long totalSeconds = duration.getSeconds();
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+
+        return String.format("%02d ч. %02d м.", hours, minutes);
+    }
+
+    @Override
+    public void validateUserInTestSuiteRunSession(TestSuiteRunSessionProjection runSession) {
+        User user = userUtils.findUserBySecurityContextAndReturn();
+
+        if (!runSession.getExecutedBy().equals(user)) {
+            throw new TestSuiteRunSessionNotFoundException(
+                    ExceptionMessage.TEST_SUITE_RUN_SESSION_NOT_FOUND_EXCEPTION_MESSAGE
+            );
+        }
     }
 
     private TestCaseRunResult createRunResult(TestCase testCase, TestSuiteRunSession runSession) {

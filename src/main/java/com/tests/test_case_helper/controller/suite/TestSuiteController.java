@@ -5,7 +5,10 @@ import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
 import com.tests.test_case_helper.dto.suite.run.*;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestSuiteRunSessionResultsDTO;
 import com.tests.test_case_helper.enums.Environment;
+import com.tests.test_case_helper.enums.TestSuiteRunStatus;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
 import com.tests.test_case_helper.service.validation.annotations.EnumValidate;
 import jakarta.validation.Valid;
@@ -195,5 +198,48 @@ public class TestSuiteController {
         TestCaseRunResultDTO testCaseResult = testSuiteService.getTestCaseResultInTestSuiteById(id);
 
         return ResponseEntity.ok(testCaseResult);
+    }
+
+    @PutMapping(Route.API_END_RUN_TEST_SUITE_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<ResponseMessageDTO> endTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+        ResponseMessageDTO results = testSuiteService.endTestSuiteRunSessionById(id, TestSuiteRunStatus.ENDED);
+
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping(Route.API_END_RUN_TEST_SUITE_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<EndTestSuiteRunSessionDTO> getEndedTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+        EndTestSuiteRunSessionDTO results = testSuiteService.getEndedTestSuiteRunSessionById(id, TestSuiteRunStatus.ENDED);
+
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping(Route.API_END_RUN_TEST_SUITE_SESSION_RESULTS_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<TestSuiteRunSessionResultsDTO> getEndedTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id,
+            Pageable pageable
+    ) {
+        TestSuiteRunSessionResultsDTO results = testSuiteService.getEndedTestSuiteRunSessionResultsById(id, pageable);
+
+        return ResponseEntity.ok(results);
     }
 }

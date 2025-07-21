@@ -42,7 +42,12 @@ public class TestSuiteRunSession {
     @Enumerated(EnumType.STRING)
     private Environment environment;
 
-    @OneToMany(mappedBy = "testSuiteRunSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "testSuiteRunSession",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
+    )
     private List<TestCaseRunResult> testCaseRunResults;
 
     @Column(name = "status")
@@ -67,7 +72,6 @@ public class TestSuiteRunSession {
                 && Objects.equals(endTime, that.endTime)
                 && Objects.equals(executedBy, that.executedBy)
                 && environment == that.environment
-                && Objects.equals(testCaseRunResults, that.testCaseRunResults)
                 && status == that.status
                 && Objects.equals(createdAt, that.createdAt)
                 && Objects.equals(updatedAt, that.updatedAt);
@@ -82,7 +86,6 @@ public class TestSuiteRunSession {
                 endTime,
                 executedBy,
                 environment,
-                testCaseRunResults,
                 status,
                 createdAt,
                 updatedAt

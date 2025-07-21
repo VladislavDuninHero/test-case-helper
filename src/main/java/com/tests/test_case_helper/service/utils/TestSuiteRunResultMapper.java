@@ -1,6 +1,6 @@
 package com.tests.test_case_helper.service.utils;
 
-import com.tests.test_case_helper.dto.suite.run.TestCaseRunResultDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultDTO;
 import com.tests.test_case_helper.dto.suite.run.TestSuiteRunSessionStatisticDTO;
 import com.tests.test_case_helper.entity.TestCaseRunResult;
 import com.tests.test_case_helper.repository.TestCaseRunResultsRepository;

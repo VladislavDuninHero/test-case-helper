@@ -10,5 +10,6 @@ public interface UserService {
     UserRegistrationResponseDTO createUser(UserRegistrationDTO userRegistrationDTO);
     UserLoginResponseDTO login(UserLoginDTO userLoginDTO);
     void disableUser(Long userId);
+    void recoveryUser(Long userId);
     UserDTO getUserByToken(String token);
 }

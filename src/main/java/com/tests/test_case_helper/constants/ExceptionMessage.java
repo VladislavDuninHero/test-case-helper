@@ -20,4 +20,8 @@ public final class ExceptionMessage {
     public static final String TEST_CASE_STATUS_NOT_FOUND_EXCEPTION_MESSAGE = "Test-case status not found";
     public static final String TEST_CASE_RESULT_NOT_FOUND_EXCEPTION_MESSAGE = "Test-case result not found";
     public static final String TEST_CASE_RESULT_MISSING_REQUIRED_FIELD_EXCEPTION_MESSAGE = "Missing required field";
+    public static final String TEST_SUITE_RUN_SESSION_ALREADY_ENDED_EXCEPTION_MESSAGE = "Test-suite run session already ended";
+    public static final String TEST_SUITE_RUN_SESSION_NOT_ENDED_EXCEPTION_MESSAGE = "Test-suite run session not ended";
+    public static final String USER_OR_TOKEN_IS_INVALID_EXCEPTION_MESSAGE = "User or token is invalid";
+    public static final String ENDED_TEST_SUITE_RUN_SESSION_CONVERT_TO_WORD_EXCEPTION = "Convert to word failed";
 }

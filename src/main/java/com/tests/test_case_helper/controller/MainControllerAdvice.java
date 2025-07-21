@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.net.ConnectException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
@@ -33,7 +34,19 @@ public class MainControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ValidationExceptionDTO<UserExceptionDTO> onTestSuiteNotFoundException(SQLIntegrityConstraintViolationException ex) {
         UserExceptionDTO userErrorDTO = new UserExceptionDTO(
-                ErrorCode.VALIDATION_ERROR.name(),
+                ErrorCode.SERVICES_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(userErrorDTO));
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ValidationExceptionDTO<UserExceptionDTO> onTestConnectToServicesException(ConnectException ex) {
+        UserExceptionDTO userErrorDTO = new UserExceptionDTO(
+                ErrorCode.SERVICES_ERROR.name(),
                 ex.getLocalizedMessage()
         );
 
