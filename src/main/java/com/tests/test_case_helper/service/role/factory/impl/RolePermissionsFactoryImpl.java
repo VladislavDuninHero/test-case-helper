@@ -21,6 +21,7 @@ public class RolePermissionsFactoryImpl implements RolePermissionsFactory {
                             PermissionType.CREATE_TEST_CASES,
                             PermissionType.READ_TEST_CASES,
                             PermissionType.UPDATE_TEST_CASES,
+                            PermissionType.DELETE_TEST_CASES,
                             PermissionType.CREATE_PROJECT,
                             PermissionType.READ_PROJECT
                     )

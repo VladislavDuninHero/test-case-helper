@@ -6,11 +6,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableConfigurationProperties
 @EnableJpaRepositories
 @EnableAspectJAutoProxy(exposeProxy = true)
+@EnableScheduling
 public class TestCaseHelperApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TestCaseHelperApplication.class, args);

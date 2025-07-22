@@ -72,4 +72,16 @@ public class UserController {
 
         return ResponseEntity.ok(new ResponseMessageDTO(ResponseMessage.USER_HAS_BEEN_DISABLED_MESSAGE));
     }
+
+    @PutMapping(Route.API_RECOVERY_ROUTE)
+    @PreAuthorize("hasAuthority('DELETE_USER')")
+    public ResponseEntity<ResponseMessageDTO> recoveryUser(
+            @PathVariable
+            @NotNull
+            Long id
+    ) {
+        userService.recoveryUser(id);
+
+        return ResponseEntity.ok(new ResponseMessageDTO(ResponseMessage.USER_HAS_BEEN_RECOVERED_MESSAGE));
+    }
 }

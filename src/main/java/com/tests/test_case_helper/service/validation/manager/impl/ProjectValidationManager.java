@@ -16,6 +16,7 @@ public class ProjectValidationManager implements ValidationManager<CreateProject
 
     @Override
     public void validate(CreateProjectDTO value) {
-        validationConfig.configureProjectValidators().forEach(validator -> validator.validate(value));
+        validationConfig.configureProjectValidators()
+                .forEach(validator -> validator.validate(value));
     }
 }

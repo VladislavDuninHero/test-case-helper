@@ -100,6 +100,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void recoveryUser(Long userId) {
+        User foundUser = userUtils.findRegisteredUserByIdAndReturn(userId);
+
+        foundUser.setIsEnabled(true);
+
+        userRepository.save(foundUser);
+    }
+
+    @Override
     public UserDTO getUserByToken(String token) {
         String login = jwtService.getLoginByToken(token);
 

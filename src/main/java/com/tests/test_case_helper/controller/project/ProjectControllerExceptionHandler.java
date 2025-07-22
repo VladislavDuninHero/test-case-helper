@@ -2,8 +2,10 @@ package com.tests.test_case_helper.controller.project;
 
 import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
+import com.tests.test_case_helper.dto.exception.TestSuiteRunSessionExceptionDTO;
 import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
 import com.tests.test_case_helper.enums.ErrorCode;
+import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
 import com.tests.test_case_helper.exceptions.InvalidSpecialCharactersException;
 import com.tests.test_case_helper.exceptions.ProjectNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -58,5 +60,20 @@ public class ProjectControllerExceptionHandler {
         );
 
         return new ValidationExceptionDTO<>(List.of(error));
+    }
+
+    @ExceptionHandler(ActiveTestingSessionIsExistsException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO<TestSuiteRunSessionExceptionDTO> onRunTestSuiteSessionsIsExistsException(
+            ActiveTestingSessionIsExistsException ex
+    ) {
+        TestSuiteRunSessionExceptionDTO testSuiteErrorDTO = new TestSuiteRunSessionExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage(),
+                ex.getActiveSessions()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
     }
 }

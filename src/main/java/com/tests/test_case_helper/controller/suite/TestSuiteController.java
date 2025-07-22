@@ -4,7 +4,14 @@ import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.suite.*;
+import com.tests.test_case_helper.dto.suite.run.*;
+import com.tests.test_case_helper.dto.suite.run.cases.TestCaseRunResultDTO;
+import com.tests.test_case_helper.dto.suite.run.cases.TestSuiteRunSessionResultsDTO;
+import com.tests.test_case_helper.enums.Environment;
+import com.tests.test_case_helper.enums.TestSuiteRunStatus;
 import com.tests.test_case_helper.service.suite.TestSuiteService;
+import com.tests.test_case_helper.service.validation.annotations.EnumValidate;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(Route.API_TEST_SUITE_ROUTE)
@@ -107,13 +115,131 @@ public class TestSuiteController {
     @PostMapping(Route.API_RUN_TEST_SUITE_ROUTE)
     @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
     @Validated
-    public ResponseEntity<ExtendedTestSuiteDTO> runTestSuite(
+    public ResponseEntity<RunTestSuiteSessionResponseDTO> runTestSuite(
             @PathVariable
             @NotNull
-            Long id
+            Long id,
+            @RequestParam
+            @NotNull
+            @EnumValidate(enumClass = Environment.class, message = "")
+            String env
     ) {
-        ExtendedTestSuiteDTO runTestSuite = testSuiteService.runTestSuite(id);
+        RunTestSuiteSessionResponseDTO runTestSuite = testSuiteService.runTestSuite(id, env);
 
         return ResponseEntity.ok(runTestSuite);
+    }
+
+    @GetMapping(Route.API_RUN_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<RunTestSuiteResponseDTO> getRunTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            Long id,
+            @RequestParam
+            @NotNull
+            Long sessionId,
+            Pageable pageable
+    ) {
+        RunTestSuiteResponseDTO runTestSuite = testSuiteService.getRunTestSuiteSessionById(id, sessionId, pageable);
+
+        return ResponseEntity.ok(runTestSuite);
+    }
+
+    @GetMapping(Route.API_GET_ACTIVE_TEST_SUITE_RUN_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<List<RunTestSuiteSessionDTO>> getActiveRunTestSuiteSessionById() {
+        List<RunTestSuiteSessionDTO> activeRunTestSuiteSessions = testSuiteService.getActiveRunTestSuiteSessions();
+
+        return ResponseEntity.ok(activeRunTestSuiteSessions);
+    }
+
+    @DeleteMapping(Route.API_DELETE_RUN_TEST_SUITE_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<ResponseMessageDTO> deleteRunTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            Long id,
+            @PathVariable
+            @NotNull
+            Long sessionId
+    ) {
+        ResponseMessageDTO runTestSuite = testSuiteService.deleteRunTestSuiteSessionById(id, sessionId);
+
+        return ResponseEntity.ok(runTestSuite);
+    }
+
+    @PutMapping(Route.API_UPDATE_RUN_TEST_SUITE_TC_RESULT_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<UpdateTestCaseResultResponseDTO> updateTestCaseResultInTestSuiteSessionById(
+            @RequestBody
+            @NotNull
+            @Valid
+            UpdateTestCaseResultDTO updateTestCaseResultDTO
+    ) {
+        System.out.println(updateTestCaseResultDTO.getStatus());
+        UpdateTestCaseResultResponseDTO testCaseResult = testSuiteService
+                .updateTestCaseResultInTestSuiteSessionById(updateTestCaseResultDTO);
+        return ResponseEntity.ok(testCaseResult);
+    }
+
+    @GetMapping(Route.API_GET_RUN_TEST_SUITE_TC_RESULT_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<TestCaseRunResultDTO> getTestCaseResultInTestSuiteById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+        TestCaseRunResultDTO testCaseResult = testSuiteService.getTestCaseResultInTestSuiteById(id);
+
+        return ResponseEntity.ok(testCaseResult);
+    }
+
+    @PutMapping(Route.API_END_RUN_TEST_SUITE_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<ResponseMessageDTO> endTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+        ResponseMessageDTO results = testSuiteService.endTestSuiteRunSessionById(id, TestSuiteRunStatus.ENDED);
+
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping(Route.API_END_RUN_TEST_SUITE_SESSION_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<EndTestSuiteRunSessionDTO> getEndedTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id
+    ) {
+        EndTestSuiteRunSessionDTO results = testSuiteService.getEndedTestSuiteRunSessionById(id, TestSuiteRunStatus.ENDED);
+
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping(Route.API_END_RUN_TEST_SUITE_SESSION_RESULTS_ROUTE)
+    @PreAuthorize("hasAuthority('READ_TEST_SUITE')")
+    @Validated
+    public ResponseEntity<TestSuiteRunSessionResultsDTO> getEndedTestSuiteSessionById(
+            @PathVariable
+            @NotNull
+            @Positive
+            Long id,
+            Pageable pageable
+    ) {
+        TestSuiteRunSessionResultsDTO results = testSuiteService.getEndedTestSuiteRunSessionResultsById(id, pageable);
+
+        return ResponseEntity.ok(results);
     }
 }

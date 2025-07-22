@@ -11,6 +11,8 @@ import com.tests.test_case_helper.properties.AdminSecretProperties;
 import com.tests.test_case_helper.repository.UserRepository;
 import com.tests.test_case_helper.service.user.UserUtils;
 import com.tests.test_case_helper.service.utils.UserMapper;
+import org.springframework.boot.actuate.endpoint.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,8 @@ public class UserUtilsImpl implements UserUtils {
             UserRepository userRepository,
             UserMapper userMapper,
             AdminSecretProperties adminSecretProperties,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.adminSecretProperties = adminSecretProperties;
@@ -91,6 +94,13 @@ public class UserUtilsImpl implements UserUtils {
         if (!passwordEncoder.matches(loginPassword, foundUserPassword)) {
             throw new UserLoginDataIsInvalidException(ExceptionMessage.USER_LOGIN_DATA_IS_INVALID);
         }
+    }
+
+    @Override
+    public User findUserBySecurityContextAndReturn() {
+        String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return findUserEntityByLoginAndReturn(userLogin);
     }
 
 }

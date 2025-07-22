@@ -34,4 +34,5 @@ VALUES
     ('CREATE_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
     ('READ_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
     ('UPDATE_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
-    ('DELETE_PROJECT', (SELECT id FROM role WHERE user_id = '1'));
+    ('DELETE_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
+    ('DELETE_USER', (SELECT id FROM role WHERE user_id = '1'));
