@@ -24,4 +24,8 @@ public final class ExceptionMessage {
     public static final String TEST_SUITE_RUN_SESSION_NOT_ENDED_EXCEPTION_MESSAGE = "Test-suite run session not ended";
     public static final String USER_OR_TOKEN_IS_INVALID_EXCEPTION_MESSAGE = "User or token is invalid";
     public static final String ENDED_TEST_SUITE_RUN_SESSION_CONVERT_TO_WORD_EXCEPTION = "Convert to word failed";
+    public static final String TEAM_NOT_FOUND_EXCEPTION_MESSAGE = "Team not found";
+    public static final String TEAMMATE_NOT_ADDED_TO_TEAM_EXCEPTION_MESSAGE = "Teammate not added to team";
+    public static final String TEAMMATE_ALREADY_ADDED_TO_TEAM_EXCEPTION_MESSAGE = "Teammate already added to team";
+    public static final String TEAM_NAME_IS_ALREADY_TAKEN_EXCEPTION_MESSAGE = "Team name is already taken";
 }

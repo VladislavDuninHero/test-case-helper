@@ -2,6 +2,7 @@ package com.tests.test_case_helper.dto.project;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,4 +24,8 @@ public class CreateProjectDTO {
     @NotEmpty
     @Size(min = 1, max = 200)
     private String description;
+
+    @NotNull
+    @Positive
+    private Long teamId;
 }

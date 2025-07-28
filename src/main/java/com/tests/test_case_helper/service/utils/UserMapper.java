@@ -1,6 +1,7 @@
 package com.tests.test_case_helper.service.utils;
 
 import com.tests.test_case_helper.dto.user.UserDTO;
+import com.tests.test_case_helper.dto.user.UserFullInfoDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationResponseDTO;
 import com.tests.test_case_helper.entity.User;
@@ -24,4 +25,10 @@ public interface UserMapper {
     @Mapping(source = "login", target = "login")
     @Mapping(source = "email", target = "email")
     UserDTO toUserDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "login", target = "login")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "isEnabled", target = "enabled")
+    UserFullInfoDTO toFullUserDTO(User user);
 }

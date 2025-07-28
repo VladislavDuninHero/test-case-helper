@@ -18,16 +18,17 @@ public class RolePermissionsFactoryImpl implements RolePermissionsFactory {
                     Roles.QA, List.of(
                             PermissionType.CREATE_TEST_SUITE,
                             PermissionType.READ_TEST_SUITE,
+                            PermissionType.UPDATE_TEST_SUITE,
+                            PermissionType.DELETE_TEST_SUITE,
                             PermissionType.CREATE_TEST_CASES,
                             PermissionType.READ_TEST_CASES,
                             PermissionType.UPDATE_TEST_CASES,
                             PermissionType.DELETE_TEST_CASES,
-                            PermissionType.CREATE_PROJECT,
                             PermissionType.READ_PROJECT
                     )
             ),
             Map.entry(
-                    Roles.LEAD_QA, List.of(
+                    Roles.QA_LEAD, List.of(
                             PermissionType.CREATE_TEST_SUITE,
                             PermissionType.READ_TEST_SUITE,
                             PermissionType.UPDATE_TEST_SUITE,
@@ -40,7 +41,28 @@ public class RolePermissionsFactoryImpl implements RolePermissionsFactory {
                             PermissionType.READ_PROJECT,
                             PermissionType.UPDATE_PROJECT,
                             PermissionType.DELETE_PROJECT,
-                            PermissionType.DELETE_USER
+                            PermissionType.DELETE_USER,
+                            PermissionType.CREATE_TEAM,
+                            PermissionType.DELETE_TEAM
+                    )
+            ),
+            Map.entry(
+                    Roles.ADMIN, List.of(
+                            PermissionType.CREATE_TEST_SUITE,
+                            PermissionType.READ_TEST_SUITE,
+                            PermissionType.UPDATE_TEST_SUITE,
+                            PermissionType.DELETE_TEST_SUITE,
+                            PermissionType.CREATE_TEST_CASES,
+                            PermissionType.READ_TEST_CASES,
+                            PermissionType.UPDATE_TEST_CASES,
+                            PermissionType.DELETE_TEST_CASES,
+                            PermissionType.CREATE_PROJECT,
+                            PermissionType.READ_PROJECT,
+                            PermissionType.UPDATE_PROJECT,
+                            PermissionType.DELETE_PROJECT,
+                            PermissionType.DELETE_USER,
+                            PermissionType.CREATE_TEAM,
+                            PermissionType.DELETE_TEAM
                     )
             )
     );

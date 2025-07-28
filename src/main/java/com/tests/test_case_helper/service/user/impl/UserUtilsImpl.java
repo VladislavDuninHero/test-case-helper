@@ -1,7 +1,10 @@
 package com.tests.test_case_helper.service.user.impl;
 
 import com.tests.test_case_helper.constants.ExceptionMessage;
+import com.tests.test_case_helper.dto.teams.TeamDTO;
+import com.tests.test_case_helper.dto.teams.TeamSlimDTO;
 import com.tests.test_case_helper.dto.user.UserDTO;
+import com.tests.test_case_helper.dto.user.UserFullInfoDTO;
 import com.tests.test_case_helper.entity.User;
 import com.tests.test_case_helper.exceptions.InvalidAdminTokenException;
 import com.tests.test_case_helper.exceptions.UserIsAlreadyRegisteredException;
@@ -15,6 +18,9 @@ import org.springframework.boot.actuate.endpoint.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class UserUtilsImpl implements UserUtils {
@@ -55,6 +61,20 @@ public class UserUtilsImpl implements UserUtils {
     }
 
     @Override
+    public UserFullInfoDTO findFullUserByLoginAndReturn(String login) {
+        User user = userRepository.findUserByLogin(login)
+                .orElseThrow(
+                        () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
+                );
+
+        Set<TeamSlimDTO> teams = user.getTeams().stream()
+                .map(team -> new TeamSlimDTO(team.getTeam().getId(), team.getTeam().getTeamName()))
+                .collect(Collectors.toSet());
+
+        return new UserFullInfoDTO(user.getId(), user.getLogin(), user.getEmail(), user.getIsEnabled(), teams);
+    }
+
+    @Override
     public User findUserEntityByLoginAndReturn(String login) {
         return userRepository.findUserByLogin(login)
                 .orElseThrow(
@@ -72,6 +92,14 @@ public class UserUtilsImpl implements UserUtils {
                     ExceptionMessage.USER_ALREADY_REGISTERED_EXCEPTION_MESSAGE
             );
         }
+    }
+
+    @Override
+    public void findRegisteredUserById(Long id) {
+        userRepository.findUserById(id)
+            .orElseThrow(
+                    () -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION_MESSAGE)
+            );
     }
 
     @Override

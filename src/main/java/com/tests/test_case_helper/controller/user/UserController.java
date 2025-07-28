@@ -5,6 +5,7 @@ import com.tests.test_case_helper.constants.ResponseMessage;
 import com.tests.test_case_helper.constants.Route;
 import com.tests.test_case_helper.dto.message.ResponseMessageDTO;
 import com.tests.test_case_helper.dto.user.UserDTO;
+import com.tests.test_case_helper.dto.user.UserFullInfoDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginResponseDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationDTO;
@@ -51,14 +52,26 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserDTO> getUserByToken(
+    public ResponseEntity<UserFullInfoDTO> getUserByToken(
             @RequestHeader(HttpHeaders.AUTHORIZATION)
             String token
     ) {
         String formattedToken = token.substring(OfficialProperties.BEARER_TOKEN_PREFIX.length());
-        UserDTO userDTO = userService.getUserByToken(formattedToken);
+        UserFullInfoDTO userFullInfoDTO = userService.getFullUserInfoByToken(formattedToken);
 
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(userFullInfoDTO);
+    }
+
+    @GetMapping(Route.API_GET_ROUTE)
+    @Validated
+    public ResponseEntity<UserFullInfoDTO> getUserById(
+            @PathVariable
+            @NotNull
+            Long id
+    ) {
+        UserFullInfoDTO user = userService.getUserById(id);
+
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping(Route.API_DELETE_ROUTE)
