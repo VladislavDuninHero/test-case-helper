@@ -4,5 +4,6 @@ public enum ErrorCode {
     EXPIRED_TOKEN,
     INVALID_TOKEN,
     VALIDATION_ERROR,
-    SERVICES_ERROR
+    SERVICES_ERROR,
+    OFFICIAL_ERROR,
 }

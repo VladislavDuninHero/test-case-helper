@@ -2,7 +2,9 @@ package com.tests.test_case_helper.service.user.impl;
 
 import com.tests.test_case_helper.constants.ExceptionMessage;
 import com.tests.test_case_helper.dto.jwt.JwtDTO;
+import com.tests.test_case_helper.dto.teams.TeamSlimDTO;
 import com.tests.test_case_helper.dto.user.UserDTO;
+import com.tests.test_case_helper.dto.user.UserFullInfoDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginDTO;
 import com.tests.test_case_helper.dto.user.login.UserLoginResponseDTO;
 import com.tests.test_case_helper.dto.user.registration.UserRegistrationDTO;
@@ -16,10 +18,16 @@ import com.tests.test_case_helper.service.security.jwt.JwtService;
 import com.tests.test_case_helper.service.user.UserService;
 import com.tests.test_case_helper.service.user.UserUtils;
 import com.tests.test_case_helper.service.utils.UserMapper;
+import com.tests.test_case_helper.service.utils.cache.EvictService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final JwtService jwtService;
+    private final EvictService evictService;
 
     public UserServiceImpl(
             UserRepository userRepository,
@@ -37,7 +46,8 @@ public class UserServiceImpl implements UserService {
             UserMapper userMapper,
             PasswordEncoder passwordEncoder,
             RoleService roleService,
-            JwtService jwtService
+            JwtService jwtService,
+            EvictService evictService
     ) {
         this.userRepository = userRepository;
         this.userUtils = userUtils;
@@ -45,6 +55,7 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
         this.roleService = roleService;
         this.jwtService = jwtService;
+        this.evictService = evictService;
     }
 
     @Override
@@ -84,10 +95,33 @@ public class UserServiceImpl implements UserService {
                 jwtService.generateAccessToken(login)
         );
 
+        evictService.evictProjectsCache(login);
+
         return new UserLoginResponseDTO(
                 login,
                 jwtDTO
         );
+    }
+
+    @Override
+    public UserFullInfoDTO getUserById(Long id) {
+        User user = userUtils.findRegisteredUserByIdAndReturn(id);
+
+        Set<TeamSlimDTO> teams = user.getTeams().stream()
+                .map(team -> new TeamSlimDTO(
+                        team.getTeam().getId(),
+                        team.getTeam().getTeamName()
+                    )
+                )
+                .collect(Collectors.toSet());
+
+        return UserFullInfoDTO.builder()
+                .id(user.getId())
+                .login(user.getLogin())
+                .email(user.getEmail())
+                .enabled(user.getIsEnabled())
+                .teams(teams)
+                .build();
     }
 
     @Override
@@ -115,4 +149,17 @@ public class UserServiceImpl implements UserService {
         return userUtils.findUserByLoginAndReturn(login);
     }
 
+    @Override
+    public UserFullInfoDTO getFullUserInfoByToken(String token) {
+        String login = jwtService.getLoginByToken(token);
+
+        return userUtils.findFullUserByLoginAndReturn(login);
+    }
+
+    @Override
+    public UserDTO getUserBySecurityContext() {
+        User user = userUtils.findUserBySecurityContextAndReturn();
+
+        return userMapper.toUserDTO(user);
+    }
 }

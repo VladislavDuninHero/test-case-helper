@@ -51,8 +51,8 @@ public class ProjectController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('READ_PROJECT')")
-    public ResponseEntity<List<ProjectDTO>> getProjects() {
-        List<ProjectDTO> projects = projectService.getAllProjects();
+    public ResponseEntity<List<ProjectTeamDTO>> getProjects() {
+        List<ProjectTeamDTO> projects = projectService.getAllProjects();
 
         return ResponseEntity.ok(projects);
     }

@@ -1,13 +1,11 @@
 package com.tests.test_case_helper.controller.project;
 
-import com.tests.test_case_helper.dto.exception.FieldExceptionDTO;
-import com.tests.test_case_helper.dto.exception.ProjectExceptionDTO;
-import com.tests.test_case_helper.dto.exception.TestSuiteRunSessionExceptionDTO;
-import com.tests.test_case_helper.dto.exception.ValidationExceptionDTO;
+import com.tests.test_case_helper.dto.exception.*;
 import com.tests.test_case_helper.enums.ErrorCode;
 import com.tests.test_case_helper.exceptions.ActiveTestingSessionIsExistsException;
 import com.tests.test_case_helper.exceptions.InvalidSpecialCharactersException;
 import com.tests.test_case_helper.exceptions.ProjectNotFoundException;
+import com.tests.test_case_helper.exceptions.TeamNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -75,5 +73,17 @@ public class ProjectControllerExceptionHandler {
         );
 
         return new ValidationExceptionDTO<>(List.of(testSuiteErrorDTO));
+    }
+
+    @ExceptionHandler(TeamNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ValidationExceptionDTO<TeamExceptionDTO> onTeamNotFoundException(TeamNotFoundException ex) {
+        TeamExceptionDTO teamExceptionDTO = new TeamExceptionDTO(
+                ErrorCode.VALIDATION_ERROR.name(),
+                ex.getLocalizedMessage()
+        );
+
+        return new ValidationExceptionDTO<>(List.of(teamExceptionDTO));
     }
 }

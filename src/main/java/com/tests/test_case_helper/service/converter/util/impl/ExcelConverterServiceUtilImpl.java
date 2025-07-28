@@ -13,6 +13,7 @@ import com.tests.test_case_helper.enums.Tag;
 import com.tests.test_case_helper.exceptions.ExcelFileParsedException;
 import com.tests.test_case_helper.service.converter.util.ExcelConverterServiceUtil;
 import com.tests.test_case_helper.service.project.utils.ProjectUtils;
+import com.tests.test_case_helper.service.utils.cache.EvictService;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -31,9 +32,14 @@ import java.util.Map;
 public class ExcelConverterServiceUtilImpl implements ExcelConverterServiceUtil {
 
     private final ProjectUtils projectUtils;
+    private final EvictService evictService;
 
-    public ExcelConverterServiceUtilImpl(ProjectUtils projectUtils) {
+    public ExcelConverterServiceUtilImpl(
+            ProjectUtils projectUtils,
+            EvictService evictService
+    ) {
         this.projectUtils = projectUtils;
+        this.evictService = evictService;
     }
 
     @Override

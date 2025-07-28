@@ -13,6 +13,7 @@ import com.tests.test_case_helper.service.project.utils.impl.ProjectUtil;
 import com.tests.test_case_helper.service.utils.ProjectMapper;
 import com.tests.test_case_helper.service.utils.TestSuiteMapper;
 import com.tests.test_case_helper.service.utils.cache.EvictService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,8 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
     public byte[] convertToExcel(Long projectId) {
         Project project = projectUtil.getProjectById(projectId);
 
+        evictService.evictProjectCache();
+
         Map<String, List<TestCaseDTO>> testSuitesWithTestCases = project
                 .getTestsSuites()
                 .stream()
@@ -72,12 +75,13 @@ public class ExcelConverterServiceImpl implements ExcelConverterService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public ExtendedProjectDTO convertFromExcel(InputStream excelFileInputStream, Long projectId) {
         List<TestSuite> testSuites = excelConverterServiceUtil.parseFromExcel(excelFileInputStream, projectId);
 
         Project project = projectUtil.getProjectById(projectId);
 
-        evictService.evictProjectCache(projectId);
+        evictService.evictTeamCache(project.getTeam().getTeammates());
 
         List<TestSuite> savedTestSuites = testSuiteRepository.saveAll(testSuites);
 

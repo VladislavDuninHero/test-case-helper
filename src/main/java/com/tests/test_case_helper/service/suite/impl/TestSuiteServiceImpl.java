@@ -42,6 +42,7 @@ import com.tests.test_case_helper.service.utils.cache.EvictService;
 import com.tests.test_case_helper.service.utils.TestSuiteRunSessionMapper;
 import com.tests.test_case_helper.service.validation.manager.impl.TestSuiteRunSessionValidationManager;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -121,7 +122,8 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
-    @CacheEvict(value = "project", key = "#createTestSuiteDTO.projectId")
+    @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public CreateTestSuiteResponseDTO createTestSuite(CreateTestSuiteDTO createTestSuiteDTO) {
         Project project = projectUtils.getProjectById(createTestSuiteDTO.getProjectId());
 
@@ -136,16 +138,19 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
         CreateTestSuiteResponseDTO createTestSuiteResponseDTO = testSuiteMapper.toDto(createdTestSuit);
         createTestSuiteResponseDTO.setProjectId(project.getId());
-        
+
+        evictService.evictTeamCache(project.getTeam().getTeammates());
+
         return createTestSuiteResponseDTO;
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public TestSuiteDTO updateTestSuiteById(Long id, UpdateTestSuiteDTO updateTestSuiteDTO) {
         TestSuite foundTestSuite = testSuiteUtil.getTestSuiteById(id);
 
-        evictService.evictProjectCache(foundTestSuite.getProject().getId());
+        evictService.evictTeamCache(foundTestSuite.getProject().getTeam().getTeammates());
 
         foundTestSuite.setTitle(updateTestSuiteDTO.getTitle());
         foundTestSuite.setDescription(updateTestSuiteDTO.getDescription());
@@ -159,8 +164,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     @Override
     public ExtendedTestSuiteDTO getTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
-
-        evictService.evictProjectCache(testSuite.getProject().getId());
 
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id);
 
@@ -177,8 +180,6 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     public ExtendedTestSuiteDTO getTestSuite(Long id, Pageable pageable) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
 
-        evictService.evictProjectCache(testSuite.getProject().getId());
-
         List<TestCaseDTO> testCases = testCaseService.getTestCasesByTestSuiteId(id, pageable);
 
         return ExtendedTestSuiteDTO.builder()
@@ -192,6 +193,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public void deleteTestSuite(Long id) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
         User user = userUtils.findUserBySecurityContextAndReturn();
@@ -206,13 +208,14 @@ public class TestSuiteServiceImpl implements TestSuiteService {
             );
         }
 
-        evictService.evictProjectCache(testSuite.getProject().getId());
+        evictService.evictTeamCache(testSuite.getProject().getTeam().getTeammates());
 
         testSuiteRepository.delete(testSuite);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public RunTestSuiteSessionResponseDTO runTestSuite(Long id, String env) {
         TestSuite testSuite = testSuiteUtil.getTestSuiteById(id);
         User user = userUtils.findUserEntityByLoginAndReturn(
@@ -301,6 +304,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public ResponseMessageDTO deleteRunTestSuiteSessionById(Long id, Long sessionId) {
         TestSuiteRunSession session = testSuiteRunSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new TestSuiteRunSessionNotFoundException(
@@ -313,6 +317,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
     }
 
     @Override
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public UpdateTestCaseResultResponseDTO updateTestCaseResultInTestSuiteSessionById(UpdateTestCaseResultDTO updateTestCaseResultDTO) {
         testSuiteUtil.getTestSuiteById(updateTestCaseResultDTO.getTestSuiteId());
         testSuiteRunSessionService.findTestSuiteRunSessionById(
@@ -362,6 +367,7 @@ public class TestSuiteServiceImpl implements TestSuiteService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "project", keyGenerator = "userCacheKeyGeneratorService")
     public ResponseMessageDTO endTestSuiteRunSessionById(Long id, TestSuiteRunStatus status) {
         TestSuiteRunSessionProjection session = testSuiteRunSessionService.findTestSuiteRunSessionByIdAndReturn(id);
 

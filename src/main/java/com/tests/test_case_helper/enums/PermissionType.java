@@ -13,5 +13,7 @@ public enum PermissionType {
     READ_PROJECT,
     UPDATE_PROJECT,
     DELETE_PROJECT,
-    DELETE_USER
+    DELETE_USER,
+    CREATE_TEAM,
+    DELETE_TEAM
 }

@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaRepositories
 @EnableAspectJAutoProxy(exposeProxy = true)
 @EnableScheduling
+@EnableCaching
 public class TestCaseHelperApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TestCaseHelperApplication.class, args);

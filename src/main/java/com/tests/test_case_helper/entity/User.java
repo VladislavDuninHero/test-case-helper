@@ -45,6 +45,9 @@ public class User {
     @JoinColumn(name = "user_id")
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserTeam> teams;
+
     @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

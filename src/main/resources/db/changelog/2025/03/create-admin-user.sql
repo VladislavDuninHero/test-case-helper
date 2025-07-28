@@ -16,7 +16,7 @@ VALUES (
 INSERT INTO role (user_id, role_name)
 VALUES (
            (SELECT id FROM users WHERE login = 'admin'),
-           'LEAD_QA'
+           'ADMIN'
        );
 
 -- changeset author:add_permissions_to_lead_qa dependsOn:create_lead_qa_role
@@ -35,4 +35,6 @@ VALUES
     ('READ_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
     ('UPDATE_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
     ('DELETE_PROJECT', (SELECT id FROM role WHERE user_id = '1')),
-    ('DELETE_USER', (SELECT id FROM role WHERE user_id = '1'));
+    ('DELETE_USER', (SELECT id FROM role WHERE user_id = '1')),
+    ('CREATE_TEAM', (SELECT id FROM role WHERE user_id = '1')),
+    ('DELETE_TEAM', (SELECT id FROM role WHERE user_id = '1'));
