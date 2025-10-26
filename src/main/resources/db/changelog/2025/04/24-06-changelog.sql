@@ -125,7 +125,7 @@ CREATE TABLE users
     login      VARCHAR(255) NULL,
     password   VARCHAR(255) NULL,
     email      VARCHAR(255) NULL,
-    is_enabled BIT(1) NULL,
+    is_enabled BOOLEAN NULL,
     created_at datetime NOT NULL,
     updated_at datetime NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)

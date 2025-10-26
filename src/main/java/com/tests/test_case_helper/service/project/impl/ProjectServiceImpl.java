@@ -162,7 +162,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         evictService.evictTeamCache(project.getTeam().getTeammates());
 
-        projectRepository.delete(project);
+        projectRepository.deleteProjectById(projectId);
     }
 
 }
